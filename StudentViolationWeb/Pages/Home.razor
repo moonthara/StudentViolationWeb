@@ -1,11 +1,102 @@
 ﻿@page "/"
 
-<MudCard>
-    <MudCardContent>
-        <MudText>Story of the day</MudText>
-        <MudText Typo="Typo.body2">The quick, brown fox jumps over a lazy dog.</MudText>
-    </MudCardContent>
-    <MudCardActions>
-        <MudButton Variant="Variant.Text" Color="Color.Dark">Learn more</MudButton>
-    </MudCardActions>
-</MudCard>
+
+<MudPaper Height="100vh" Width="100%" Elevation="0"
+          Style="display: flex; align-items: center; justify-content: center; background: #0A2342;">
+
+    <MudCard Style="width: 420px; border-radius: 16px;" Elevation="4" >
+
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h4" Align="Align.Center" Style="font-weight: 700; ">
+                    Login
+                </MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+
+
+        <MudCardContent>
+            <MudForm @ref="form" @bind-IsValid="isValid">
+
+                <MudTextField T="string"
+                              Label="Username"
+                              @bind-Value="username"
+                              Required="true"
+                              RequiredError="Username is required"
+                              Variant="Variant.Outlined"
+                              Adornment="Adornment.End"
+                              AdornmentIcon="@Icons.Material.Filled.Person"
+                              Class="mb-4" />
+
+                <MudTextField T="string"
+                              Label="Password"
+                              @bind-Value="password"
+                              Required="true"
+                              RequiredError="Password is required"
+                              InputType="@pwdType"
+                              Variant="Variant.Outlined"
+                              Adornment="Adornment.End"
+                              AdornmentIcon="@Icons.Material.Filled.Lock"
+                              OnAdornmentClick="TogglePassword"
+                              Class="mb-2" />
+
+                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-2">
+                    <MudCheckBox T="bool" @bind-Checked="rememberMe"
+                                 Label="Remember me"
+                                 Color="Color.Primary"  />
+                    <MudLink Color="Color.Primary" Style="font-size: 0.50rem;"> 
+                        Forgot Password?
+                    </MudLink>
+                </MudStack>
+
+            </MudForm>
+
+        </MudCardContent>
+
+        <MudCardActions Class="px-4 pb-6" Style="flex-direction: column; gap: 12px;">
+
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       FullWidth="true"
+                       Size="Size.Large"                      
+                       Disabled="!isValid"
+                       Style="border-radius: 50px; padding: 14px; font-weight: 600; background:#0A2342;">Login</MudButton>
+
+            <MudText Align="Align.Center" Typo="Typo.body2">
+                Don't have an account?
+                <MudLink Href="/register" Color="Color.Primary">Sign Up</MudLink>
+            </MudText>
+
+        </MudCardActions>
+
+    </MudCard>
+
+</MudPaper>
+
+@code {
+    MudForm form = default!;
+    bool isValid;
+    bool rememberMe;
+    string username = "";
+    string password = "";
+
+    InputType pwdType = InputType.Password;
+    string pwdIcon = Icons.Material.Filled.VisibilityOff;
+
+    void TogglePassword()
+    {
+        if (pwdType == InputType.Password)
+        {
+            pwdType = InputType.Text;
+            pwdIcon = Icons.Material.Filled.Visibility;
+        }
+        else
+        {
+            pwdType = InputType.Password;
+            pwdIcon = Icons.Material.Filled.VisibilityOff;
+        }
+    }
+
+    
+}
+
