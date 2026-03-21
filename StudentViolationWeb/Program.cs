@@ -12,3 +12,4 @@ builder.Services.AddMudServices(); //mudblazor
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
 await builder.Build().RunAsync();
+//adding commits for pushing 
