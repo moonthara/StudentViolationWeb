@@ -1,21 +1,21 @@
 ﻿@page "/"
 @page "/login"
 
-<div style="display: flex; height: 100vh; width: 100%; font-family: 'Segoe UI', sans-serif; background: #003262;">
+<div style="display: flex; height: 100vh; width: 100%; font-family: 'Segoe UI', sans-serif; background-image: linear-gradient(to bottom, #0F0E0E, #541219); ">
 
     @*left *@
-    <div style="width: 45%; background: #003262; display: flex; flex-direction: column;
-                align-items: center; justify-content: center; padding: 60px 80px; flex-shrink: 0;
-                border-right: 1px solid rgba(255,255,255,0.1);">
+    <div style="width: 45%; background:  linear-gradient(to bottom, #0F0E0E, #541219); display: flex; flex-direction: column;
+                align-items: center; justify-content: center; padding: 60px 80px; flex-shrink: 0;">
 
-        <MudIcon Icon="@Icons.Material.Filled.School"
-                 Style="font-size: 100px; color: white; margin-bottom: 24px;" />
+        <img src="Image/aclc_logo.png"
+             alt="ACLC Logo"
+             style="width: 120px; height: auto;" />
         <MudText Typo="Typo.h6" Align="Align.Center"
-                 Style="color: rgba(255,255,255,0.75); font-weight: 500; margin-bottom: 8px; letter-spacing: 2px; text-transform: uppercase;">
+                 Style="color: #EEEEEE; font-weight: 500; margin-bottom: 8px; letter-spacing: 2px; text-transform: uppercase;">
             ACLC College of Mandaue
         </MudText>
         <MudText Typo="Typo.h3" Align="Align.Center"
-                 Style="color: white; font-weight: 800; margin-bottom: 20px; line-height: 1.2;">
+                 Style="color: #EEEEEE; font-weight: 800; margin-bottom: 20px; line-height: 1.2;">
             Student Violation System
         </MudText>
         
@@ -24,20 +24,27 @@
     @* right *@
     <div style="flex: 1; display: flex; flex-direction: column;
                 align-items: center; justify-content: center;
-                background: rgba(255,255,255,0.04); padding: 60px 80px; overflow-y: auto;">
+                background: rgba(255,255,255,0.00); padding: 60px 80px; overflow-y: auto;">
 
-        <div style="width: 100%; max-width: 480px;">
+        <div style="width: 100%; max-width: 480px;
+                background: rgba(0, 0, 0, 0.2);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                border: 1px solid rgba(255,255,255,0.1);
+                border-radius: 20px;
+                padding: 48px 40px;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
 
             <MudText Typo="Typo.h4" Style="color: white; font-weight: 700; margin-bottom: 8px;">
                 Welcome back
             </MudText>
-            <MudText Typo="Typo.body1" Style="color: rgba(255,255,255,0.6); margin-bottom: 40px;">
+            <MudText Typo="Typo.body1" Style="color: rgba(255,255,255,0.5); margin-bottom: 40px;">
                 Sign in to your account to continue
             </MudText>
 
             <MudForm @ref="form" @bind-IsValid="isValid">
 
-                <MudText Style="color: rgba(255,255,255,0.7); font-size: 0.85rem; margin-bottom: 6px;">Username</MudText>
+                <MudText Style="color: #468A9A; font-size: 0.85rem; margin-bottom: 6px;">Username</MudText>
                 <MudTextField T="string"
                               @bind-Value="username"
                               Required="true"
@@ -46,10 +53,10 @@
                               Adornment="Adornment.End"
                               AdornmentIcon="@Icons.Material.Filled.Person"
                               Class="mb-5"
-                              Style="color: white;"
-                              InputStyle="color: white;" />
+                              Style="color: #EEEEEE;"
+                              InputStyle="color: default;" />
 
-                <MudText Style="color: rgba(255,255,255,0.7); font-size: 0.85rem; margin-bottom: 6px;">Password</MudText>
+                <MudText Style="color: #468A9A; font-size: 0.85rem; margin-bottom: 6px;">Password</MudText>
                 <MudTextField T="string"
                               @bind-Value="password"
                               Required="true"
@@ -60,17 +67,17 @@
                               AdornmentIcon="@pwdIcon"
                               OnAdornmentClick="TogglePassword"
                               Class="mb-4"
-                              Style="color: white;"
-                              InputStyle="color: white;" />
+                              Style="color: #EEEEEE;"
+                              InputStyle="color: default;" />
 
                 <MudStack Row="true" Justify="Justify.SpaceBetween"
                           AlignItems="AlignItems.Center" Class="mb-6">
                     <MudCheckBox T="bool" @bind-Checked="rememberMe"
                                  Label="Remember me"
-                                 Color="Color.Primary"
-                                 Style="color: rgba(255,255,255,0.75);" />
+                                 Color="Color.Inherit"
+                                 Style="color: #EEEEEE;" />
                     <MudLink Color="Color.Default"
-                             Style="font-size: 0.85rem; color: rgba(255,255,255,0.6); cursor: pointer;">
+                             Style="font-size: 0.85rem; color: #468A9A; cursor: pointer;">
                         Forgot Password?
                     </MudLink>
                 </MudStack>
@@ -80,7 +87,7 @@
                            Size="Size.Large"
                            Disabled="!isValid"
                            OnClick="HandleLogin"
-                           Style="background: white; color: #003262; font-weight: 700;
+                           Style="background: #468A9A; color: #468A9; font-weight: 700;
                                   font-size: 1rem; border-radius: 8px; padding: 16px;
                                   text-transform: none; letter-spacing: 0;">
                     Sign In
