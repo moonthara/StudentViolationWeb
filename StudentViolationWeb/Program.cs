@@ -9,7 +9,8 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddMudServices(); //mudblazor
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+builder.Services.AddScoped(sp => new HttpClient { 
+    BaseAddress = new Uri("http://localhost:59506/") });
 
 await builder.Build().RunAsync();
 //adding commits for pushing 
