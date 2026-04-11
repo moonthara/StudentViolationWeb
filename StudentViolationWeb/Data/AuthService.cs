@@ -1,49 +1,78 @@
-﻿//using System.Net.Http.Json;
-//using Microsoft.JSInterop;
-//using StudentViolationWeb.Model;
+﻿using Blazored.LocalStorage;
+using StudentViolationWeb.Model;
+using StudentViolationWeb.Model.Response;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 
-//namespace StudentViolationWeb.Data
-//{
-//    public class AuthService
-//    {
-//        private readonly HttpClient _http;
-//        private readonly IJSRuntime _js;
 
-//        public AuthService(HttpClient http, IJSRuntime js)
-//        {
-//            _http = http;
-//            _js = js;
-//        }
+public class AuthService
+{
+    private readonly HttpClient _http;
+    private readonly ILocalStorageService _localStorage;
 
-//        public async Task<bool> Login(LoginModel loginModel)
-//        {
-//            var response = await _http.PostAsJsonAsync("api/auth/login", loginModel);
 
-//            if (response.IsSuccessStatusCode)
-//            {
-//                var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
-//                // Store token in localStorage
-//                await _js.InvokeVoidAsync("localStorage.setItem", "token", result!.Token);
-//                return true;
-//            }
 
-//            return false;
-//        }
+    public AuthService(HttpClient http, ILocalStorageService localStorage)
+    {
+        _http = http;
+        _localStorage = localStorage;
+    }
 
-//        public async Task Logout()
-//        {
-//            await _js.InvokeVoidAsync("localStorage.removeItem", "token");
-//        }
+    public async Task<ServiceResponse<LoginDto>> LoginAsync(LoginModel login)
+    {
+        try
+        {
+            var response = await _http.PostAsJsonAsync("api/auth/login", login);
+            var result = await response.Content.ReadFromJsonAsync<ServiceResponse<LoginDto>>();
+           
 
-//        public async Task<string?> GetToken()
-//        {
-//            return await _js.InvokeAsync<string>("localStorage.getItem", "token");
-//        }
+            if (result?.Token != null)
+            {
+                await _localStorage.SetItemAsync("authToken", result.Token);
+                _http.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", result.Token);
+            }
 
-//        public async Task<bool> IsLoggedIn()
-//        {
-//            var token = await GetToken();
-//            return !string.IsNullOrEmpty(token);
-//        }
-//    }
-//}
+            return result ?? new ServiceResponse<LoginDto> { Status = 500, Message = "Empty response" };
+        }
+        catch (Exception ex)
+        {
+            return new ServiceResponse<LoginDto> { Status = 500, Message = ex.Message };
+        }
+    }
+
+    public async Task<ServiceResponse<LoginDto>> RegisterAsync(RegisterModel register)
+    {
+        try
+        {
+            var response = await _http.PostAsJsonAsync("api/auth/register", register);
+            var result = await response.Content.ReadFromJsonAsync<ServiceResponse<LoginDto>>();
+
+
+            if (result?.Token != null)
+            {
+                await _localStorage.SetItemAsync("authToken", result.Token);
+                _http.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", result.Token);
+            }
+
+            return result ?? new ServiceResponse<LoginDto> { Status = 500, Message = "Empty response" };
+        }
+        catch (Exception ex)
+        {
+            return new ServiceResponse<LoginDto> { Status = 500, Message = ex.Message };
+        }
+    }
+
+    public async Task Logout()
+    {
+        await _localStorage.RemoveItemAsync("authToken");
+        _http.DefaultRequestHeaders.Authorization = null;
+    }
+}
+
+public class LoginDto
+{
+    public string Role { get; set; } = "";
+    public string? Token { get; set; }
+}

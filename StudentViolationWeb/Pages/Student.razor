@@ -1,0 +1,283 @@
+﻿@page "/student"
+@page "/student/dashboard"
+@inject NavigationManager Nav
+@inject AuthService AuthService
+
+<div style="min-height: 100vh; background: #F0F2F8; font-family: 'Segoe UI', sans-serif;">
+
+    @
+    <div style="background: #0014A8; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 12px rgba(0,20,168,0.3);">
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <img src="Image/aclc_logo.png" alt="ACLC" style="width: 40px; height: auto;" />
+            <MudText Typo="Typo.h6" Style="color: white; font-weight: 700; margin: 0;">
+                Student Dashboard
+            </MudText>
+        </div>
+        <MudIconButton Icon="@Icons.Material.Filled.Logout"
+                       Style="color: white;"
+                       OnClick="HandleLogout"
+                       Title="Logout" />
+    </div>
+
+   
+    <div style="background: #0014A8; border-bottom: 3px solid rgba(255,255,255,0.1);">
+        <div style="max-width: 960px; margin: 0 auto; display: flex;">
+            @TabBtn(Icons.Material.Filled.Dashboard, "Dashboard", "dashboard")
+            @TabBtn(Icons.Material.Filled.Person, "Profile", "profile")
+            @TabBtn(Icons.Material.Filled.QrCode2, "QR Code", "qrcode")
+        </div>
+    </div>
+
+    
+    <div style="max-width: 960px; margin: 0 auto; padding: 32px 24px;">
+
+        
+        @if (activeTab == "dashboard")
+        {
+            
+            <div style="background: linear-gradient(135deg, #0014A8 0%, #0022D4 100%);
+                            border-radius: 16px; padding: 28px 32px; margin-bottom: 24px;
+                            display: flex; align-items: center; gap: 20px;
+                            box-shadow: 0 4px 20px rgba(0,20,168,0.25);">
+                <div style="width: 56px; height: 56px; border-radius: 14px;
+                                background: rgba(255,255,255,0.15); display: flex;
+                                align-items: center; justify-content: center;">
+                    <MudIcon Icon="@Icons.Material.Filled.School" Style="color: white; font-size: 32px;" />
+                </div>
+                <div>
+                    <MudText Style="color: white; font-size: 1.25rem; font-weight: 700; margin: 0;">
+                        Welcome, @studentName!
+                    </MudText>
+                    <MudText Style="color: rgba(255,255,255,0.65); font-size: 0.875rem; margin: 0;">
+                        Student Portal
+                    </MudText>
+                </div>
+            </div>
+
+            
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px;">
+                <div style="background: white; border-radius: 14px; padding: 20px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-top: 4px solid #0014A8;">
+                    <MudText Style="color: #888; font-size: 0.78rem; margin-bottom: 8px;">Total</MudText>
+                    <MudText Style="font-size: 2rem; font-weight: 800; color: #0014A8; line-height: 1;">@totalViolations</MudText>
+                </div>
+                <div style="background: white; border-radius: 14px; padding: 20px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-top: 4px solid #F59E0B;">
+                    <MudText Style="color: #888; font-size: 0.78rem; margin-bottom: 8px;">Pending</MudText>
+                    <MudText Style="font-size: 2rem; font-weight: 800; color: #F59E0B; line-height: 1;">@pendingViolations</MudText>
+                </div>
+                <div style="background: white; border-radius: 14px; padding: 20px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-top: 4px solid #10B981;">
+                    <MudText Style="color: #888; font-size: 0.78rem; margin-bottom: 8px;">Approved</MudText>
+                    <MudText Style="font-size: 2rem; font-weight: 800; color: #10B981; line-height: 1;">@approvedViolations</MudText>
+                </div>
+                <div style="background: white; border-radius: 14px; padding: 20px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-top: 4px solid #EF4444;">
+                    <MudText Style="color: #888; font-size: 0.78rem; margin-bottom: 8px;">Rejected</MudText>
+                    <MudText Style="font-size: 2rem; font-weight: 800; color: #EF4444; line-height: 1;">@rejectedViolations</MudText>
+                </div>
+            </div>
+
+           
+            <div style="background: white; border-radius: 14px; padding: 20px 24px;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 24px;
+                            display: flex; align-items: center; gap: 16px;">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: #ECFDF5;
+                                display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Style="color: #10B981; font-size: 22px;" />
+                </div>
+                <div>
+                    <MudText Style="color: #10B981; font-weight: 700; font-size: 0.95rem; margin: 0;">
+                        Warning Level: @(warningLevel ?? "—")
+                    </MudText>
+                    <MudText Style="color: #aaa; font-size: 0.82rem; margin: 0;">
+                        @(string.IsNullOrEmpty(warningLevel) ? "No data available" : warningDetail)
+                    </MudText>
+                </div>
+            </div>
+
+            
+            <div style="background: white; border-radius: 14px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                    <div style="width: 4px; height: 22px; background: #0014A8; border-radius: 4px;"></div>
+                    <MudText Typo="Typo.h6" Style="font-weight: 700; color: #1a1a2e; margin: 0;">
+                        Violation History
+                    </MudText>
+                </div>
+
+                @if (!violations.Any())
+                {
+                    <div style="text-align: center; padding: 48px 0;">
+                        <div style="width: 64px; height: 64px; border-radius: 50%; background: #ECFDF5;
+                                            display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                            <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Style="color: #10B981; font-size: 36px;" />
+                        </div>
+                        <MudText Style="color: #10B981; font-weight: 700; font-size: 1rem; margin-bottom: 4px;">
+                            No violations recorded!
+                        </MudText>
+                        <MudText Style="color: #aaa; font-size: 0.85rem;">Keep up the good work!</MudText>
+                    </div>
+                }
+                else
+                {
+                    <MudTable Items="violations" Hover="true" Elevation="0"
+                              Style="border-radius: 10px; overflow: hidden;">
+                        <HeaderContent>
+                            <MudTh Style="background: #F0F2F8; color: #888; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;">Violation</MudTh>
+                            <MudTh Style="background: #F0F2F8; color: #888; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;">Category</MudTh>
+                            <MudTh Style="background: #F0F2F8; color: #888; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;">Date</MudTh>
+                            <MudTh Style="background: #F0F2F8; color: #888; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;">Reported By</MudTh>
+                            <MudTh Style="background: #F0F2F8; color: #888; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;">Status</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd Style="font-weight: 500; color: #1a1a2e;">@context.ViolationName</MudTd>
+                            <MudTd Style="color: #555;">@context.Category</MudTd>
+                            <MudTd Style="color: #888;">@context.Date.ToString("MMM dd, yyyy")</MudTd>
+                            <MudTd Style="color: #555;">@context.ReportedBy</MudTd>
+                            <MudTd>
+                                <span style="@StatusBadgeStyle(context.Status)">@context.Status</span>
+                            </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                }
+            </div>
+        }
+
+        
+        @if (activeTab == "profile")
+        {
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 24px;">
+
+                
+                <div style="background: linear-gradient(135deg, #0014A8 0%, #0022D4 100%);
+                                border-radius: 20px; padding: 40px 60px; text-align: center;
+                                box-shadow: 0 4px 20px rgba(0,20,168,0.25); width: 100%; max-width: 400px;">
+                    <div style="width: 80px; height: 80px; border-radius: 50%;
+                                    background: rgba(255,255,255,0.2); display: flex;
+                                    align-items: center; justify-content: center;
+                                    margin: 0 auto 16px; font-size: 2rem; font-weight: 700; color: white;">
+                        @studentInitial
+                    </div>
+                    <MudText Style="color: white; font-size: 1.3rem; font-weight: 700; margin: 0;">
+                        @studentName
+                    </MudText>
+                    <MudText Style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin: 4px 0 0;">
+                        @(string.IsNullOrEmpty(studentNo) ? "—" : studentNo)
+                    </MudText>
+                </div>
+
+                
+                <div style="background: white; border-radius: 16px; padding: 8px 32px;
+                                box-shadow: 0 2px 8px rgba(0,0,0,0.06); width: 100%; max-width: 600px;">
+                    @ProfileRow(Icons.Material.Filled.School, "Course", course)
+                    @ProfileRow(Icons.Material.Filled.CalendarToday, "Year Level", year)
+                    @ProfileRow(Icons.Material.Filled.Email, "Email", email)
+                    @ProfileRow(Icons.Material.Filled.Person, "Gender", gender)
+                    @ProfileRow(Icons.Material.Filled.Phone, "Contact", contact)
+                </div>
+
+            </div>
+        }
+
+       
+        @if (activeTab == "qrcode")
+        {
+            <div style="display: flex; flex-direction: column; align-items: center; padding: 40px 0;">
+                <MudText Typo="Typo.h5" Style="color: #0014A8; font-weight: 700; margin-bottom: 8px;">
+                    My QR Code
+                </MudText>
+                <MudText Style="color: #888; font-size: 0.9rem; margin-bottom: 32px;">
+                    Show this to the Guard for scanning
+                </MudText>
+
+                <div style="background: white; border-radius: 20px; padding: 40px;
+                                box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center;">
+                    
+                    <MudIcon Icon="@Icons.Material.Filled.QrCode2"
+                             Style="font-size: 200px; color: #1a1a2e;" />
+                    <MudText Style="color: #aaa; font-size: 0.85rem; margin-top: 16px;">
+                        @(string.IsNullOrEmpty(studentNo) ? "Student ID not available" : studentNo)
+                    </MudText>
+                </div>
+
+                <MudText Style="color: #bbb; font-size: 0.78rem; margin-top: 20px; text-align: center; max-width: 360px;">
+                    Keep this QR code visible for identity verification at the entrance.
+                </MudText>
+            </div>
+        }
+
+    </div>
+</div>
+
+@code {
+    string activeTab = "dashboard";
+
+    string studentInitial => studentName.Length > 0 ? studentName[0].ToString().ToUpper() : "S";
+
+    int totalViolations => violations.Count;
+    int pendingViolations => violations.Count(v => v.Status == "Pending");
+    int approvedViolations => violations.Count(v => v.Status == "Approved");
+    int rejectedViolations => violations.Count(v => v.Status == "Rejected");
+
+    List<ViolationItem> violations = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+        var student  = await StudentService.GetProfileAsync();
+        studentName  = $"{student.FirstName} {student.LastName}";
+        studentNo    = student.StudentNo;
+        course       = student.Course;
+        year         = student.Year;
+        email        = student.Email;
+        gender       = student.Gender;
+        contact      = student.Contact;
+        warningLevel = student.WarningLevel;
+        violations   = await ViolationService.GetMyViolationsAsync();
+    }
+
+    void HandleLogout()
+    {
+        
+        Nav.NavigateTo("/login");
+    }
+
+    string StatusBadgeStyle(string status) => status switch
+    {
+        "Pending" => "background:#FFFBEB; color:#F59E0B; padding:4px 14px; border-radius:20px; font-size:0.78rem; font-weight:600;",
+        "Approved" => "background:#ECFDF5; color:#10B981; padding:4px 14px; border-radius:20px; font-size:0.78rem; font-weight:600;",
+        "Rejected" => "background:#FEF2F2; color:#EF4444; padding:4px 14px; border-radius:20px; font-size:0.78rem; font-weight:600;",
+        _ => "background:#F0F2F8; color:#888; padding:4px 14px; border-radius:20px; font-size:0.78rem; font-weight:600;"
+    };
+
+    RenderFragment TabBtn(string icon, string label, string tab) => __builder =>
+    {
+        bool isActive = activeTab == tab;
+        <div @onclick="@(() => activeTab = tab)"
+             style="@($"display:flex; flex-direction:column; align-items:center; gap:6px; padding:14px 40px; cursor:pointer; border-bottom:3px solid {(isActive ? "white" : "transparent")}; color:{(isActive ? "white" : "rgba(255,255,255,0.55)")}; transition:all 0.2s;")">
+            <MudIcon Icon="@icon" Style="font-size:22px;" />
+            <MudText Style="@($"font-size:0.8rem; font-weight:{(isActive ? "700" : "400")};")">@label</MudText>
+        </div>
+    };
+
+    RenderFragment ProfileRow(string icon, string label, string value) => __builder =>
+    {
+        <div style="display:flex; align-items:center; gap:16px; padding:16px 0; border-bottom:1px solid #F0F2F8;">
+            <div style="width:38px; height:38px; border-radius:10px; background:#EEF0FF;
+                                display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <MudIcon Icon="@icon" Style="color:#0014A8; font-size:18px;" />
+            </div>
+            <div>
+                <MudText Style="color:#aaa; font-size:0.75rem; margin:0;">@label</MudText>
+                <MudText Style="color:#1a1a2e; font-weight:600; font-size:0.95rem; margin:0;">
+                    @(string.IsNullOrEmpty(value) ? "—" : value)
+                </MudText>
+            </div>
+        </div>
+    };
+
+    class ViolationItem
+    {
+        public string ViolationName { get; set; } = "";
+        public string Category { get; set; } = "";
+        public DateTime Date { get; set; }
+        public string ReportedBy { get; set; } = "";
+        public string Status { get; set; } = "";
+    }
+}

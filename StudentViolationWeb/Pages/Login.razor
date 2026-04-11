@@ -1,13 +1,16 @@
 ﻿@page "/"
 @page "/login"
 @inject NavigationManager Nav
-@* @inject AuthService AuthService *@
+@inject AuthService AuthService
+@inject HttpClient Http
+@inject ISnackbar Snackbar
 
 
-<div style="display: flex; height: 100vh; width: 100%; font-family: 'Segoe UI', sans-serif; background-image: linear-gradient(to bottom, #0F0E0E, #541219); ">
+
+<div style="display: flex; height: 100vh; width: 100%; font-family: 'Segoe UI', sans-serif; background-image: linear-gradient(45deg, #F0FFF0, #0014A8); ">
 
     @*left *@
-    <div style="width: 45%; background:  linear-gradient(to bottom, #0F0E0E, #541219); display: flex; flex-direction: column;
+    <div style="width: 45%;  display: flex; flex-direction: column;
                 align-items: center; justify-content: center; padding: 60px 80px; flex-shrink: 0;">
 
         <img src="Image/aclc_logo.png"
@@ -21,7 +24,7 @@
                  Style="color: #EEEEEE; font-weight: 800; margin-bottom: 20px; line-height: 1.2;">
             Student Violation System
         </MudText>
-        
+
     </div>
 
     @* right *@
@@ -30,13 +33,13 @@
                 background: rgba(255,255,255,0.00); padding: 60px 80px; overflow-y: auto;">
 
         <div style="width: 100%; max-width: 480px;
-                background: rgba(0, 0, 0, 0.2);
+                background: rgba(173, 216, 230, 0.15);
                 backdrop-filter: blur(12px);
                 -webkit-backdrop-filter: blur(12px);
                 border: 1px solid rgba(255,255,255,0.1);
                 border-radius: 20px;
                 padding: 48px 40px;
-                box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
+                box-shadow: 0 8px 32px rgba(250,250,250,0.15);">
 
             <MudText Typo="Typo.h4" Style="color: white; font-weight: 700; margin-bottom: 8px;">
                 Welcome back
@@ -47,7 +50,7 @@
 
             <MudForm @ref="form" @bind-IsValid="isValid">
 
-                <MudText Style="color: #468A9A; font-size: 0.85rem; margin-bottom: 6px;">Username</MudText>
+                <MudText Style="color: #EEEEEE; font-size: 0.85rem; margin-bottom: 6px;">Username</MudText>
                 <MudTextField T="string"
                               @bind-Value="username"
                               Required="true"
@@ -59,7 +62,7 @@
                               Style="color: #EEEEEE;"
                               InputStyle="color: default;" />
 
-                <MudText Style="color: #468A9A; font-size: 0.85rem; margin-bottom: 6px;">Password</MudText>
+                <MudText Style="color: #EEEEEE; font-size: 0.85rem; margin-bottom: 6px;">Password</MudText>
                 <MudTextField T="string"
                               @bind-Value="password"
                               Required="true"
@@ -80,21 +83,37 @@
                                  Color="Color.Inherit"
                                  Style="color: #EEEEEE;" />
                     <MudLink Color="Color.Default"
-                             Style="font-size: 0.85rem; color: #468A9A; cursor: pointer;">
+                             Style="font-size: 0.85rem; color: #0014A8; cursor: pointer;">
                         Forgot Password?
                     </MudLink>
                 </MudStack>
 
-                <MudButton Variant="Variant.Filled"
-                           FullWidth="true"
-                           Size="Size.Large"
-                           Disabled="!isValid"
-                           OnClick="HandleLogin"
-                           Style="background: #468A9A; color: #EEEEEE; font-weight: 700;
-                                  font-size: 1rem; border-radius: 8px; padding: 16px;
-                                  text-transform: none; letter-spacing: 0;">
-                    Sign In
-                </MudButton>
+                @if (isLoading)
+                {
+                    <MudButton Variant="Variant.Filled"
+                               FullWidth="true"
+                               Size="Size.Large"
+                               Disabled="true"
+                               Style="background: #0014A8; color: #EEEEEE; font-weight: 700;
+                                          font-size: 1rem; border-radius: 8px; padding: 16px;
+                                          text-transform: none; letter-spacing: 0;">
+                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Style="margin-right: 8px;" />
+                        Signing In...
+                    </MudButton>
+                }
+                else
+                {
+                    <MudButton Variant="Variant.Filled"
+                               FullWidth="true"
+                               Size="Size.Large"
+                               Disabled="!isValid"
+                               OnClick="HandleLogin"
+                               Style="background: #0014A8; color: #EEEEEE; font-weight: 700;
+                                          font-size: 1rem; border-radius: 8px; padding: 16px;
+                                          text-transform: none; letter-spacing: 0;">
+                        Sign In
+                    </MudButton>
+                }
 
             </MudForm>
 
@@ -117,6 +136,7 @@
 @code {
     MudForm form = default!;
     bool isValid;
+    bool isLoading;
     bool rememberMe;
     public string username = "";
     public string password = "";
@@ -138,11 +158,51 @@
         }
     }
 
-    void HandleLogin()
+    async Task HandleLogin()
     {
-        // if (result.Role == "Student")  Nav.NavigateTo("/student/dashboard");
-        // if (result.Role == "Guard")    Nav.NavigateTo("/guard/dashboard");
-        // if (result.Role == "SAO")      Nav.NavigateTo("/sao/dashboard");
-        // if (result.Role == "Guidance") Nav.NavigateTo("/guidance/dashboard");
+        await form.Validate();
+        if (!isValid) return;
+
+        isLoading = true;
+
+        try
+        {
+            var loginModel = new LoginModel { Username = username.Trim().ToLower(), Password = password.Trim() };
+            var result = await AuthService.LoginAsync(loginModel);
+
+            if (result != null && result.Status == 200 && result.Data != null)
+            {
+                switch (result.Data.Role)
+                {
+                    case "Student":
+                        Nav.NavigateTo("/student/dashboard");
+                        break;
+                    case "Guard":
+                        Nav.NavigateTo("/guard");
+                        break;
+                    case "Guidance":
+                        Nav.NavigateTo("/guidance");
+                        break;
+                    case "Sao":
+                        Nav.NavigateTo("/sao");
+                        break;
+                    default:
+                        Nav.NavigateTo("/");
+                        break;
+                }
+            }
+            else
+            {
+                Snackbar.Add(result?.Message ?? "Invalid username or password.", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Connection error: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isLoading = false;
+        }
     }
 }

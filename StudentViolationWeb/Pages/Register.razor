@@ -1,11 +1,12 @@
 ﻿@page "/register"
 @inject NavigationManager Nav
 @inject ISnackbar Snackbar
+@inject AuthService AuthService
 
-<div style="display: flex; height: 100vh; width: 100%; font-family: 'Segoe UI', sans-serif; background-image: linear-gradient(45deg #071952, #EBF4F6); ">
+<div style="display: flex; height: 100vh; width: 100%; font-family: 'Segoe UI', sans-serif; background-image: linear-gradient(45deg, #0014A8, #F0FFF0); ">
 
     @*left *@
-    <div style="width: 45%; background:  linear-gradient(45deg #071952, #EBF4F6); display: flex; flex-direction: column;
+    <div style="width: 45%; display: flex; flex-direction: column;
                 align-items: center; justify-content: center; padding: 60px 80px; flex-shrink: 0;">
 
         <img src="Image/aclc_logo.png"
@@ -23,17 +24,15 @@
     </div>
 
     @*right*@
-
     <div style="flex: 1; overflow-y: auto; padding: 60px 80px; justify-content: center;">
 
-        <div style="width: 100%; max-width: 720px;  
+        <div style="width: 100%; max-width: 720px;
         background: rgba(255, 255, 255, 0.15);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         border: 1px solid rgba(250,250,250,0.3);
         border-radius: 20px;
         padding: 48px 40px;
-
         box-shadow: 0 8px 32px rgba(250,250,250,0.15);">
 
             <MudText Typo="Typo.h4" Style="color: #FAFAFA; font-weight: 700; margin-bottom: 8px;">
@@ -54,37 +53,37 @@
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; margin-bottom: 36px;">
 
-                    <div @onclick="@(() => model.Role = "Student")"
-                         style="@($"display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 12px; border-radius: 12px; cursor: pointer; border: 2px solid {(model.Role == "Student" ? "white" : "rgba(255,255,255,0.15)")}; background: {(model.Role == "Student" ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.05)")};")">
+                    <div @onclick="@(() => model.Role = "student")"
+                         style="@($"display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 12px; border-radius: 12px; cursor: pointer; border: 2px solid {(model.Role == "student" ? "white" : "rgba(255,255,255,0.15)")}; background: {(model.Role == "student" ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.05)")};")">
                         <MudIcon Icon="@Icons.Material.Filled.School"
-                                 Style="@($"font-size: 32px; margin-bottom: 8px; color: {(model.Role == "Student" ? "white" : "rgba(255,255,255,0.5)")}")" />
-                        <MudText Style="@($"font-size: 0.8rem; font-weight: {(model.Role == "Student" ? "700" : "400")}; color: {(model.Role == "Student" ? "white" : "rgba(255,255,255,0.6)")}")">Student</MudText>
+                                 Style="@($"font-size: 32px; margin-bottom: 8px; color: {(model.Role == "student" ? "white" : "rgba(255,255,255,0.5)")}")" />
+                        <MudText Style="@($"font-size: 0.8rem; font-weight: {(model.Role == "student" ? "700" : "400")}; color: {(model.Role == "student" ? "white" : "rgba(255,255,255,0.6)")}")">Student</MudText>
                     </div>
 
-                    <div @onclick="@(() => model.Role = "Guard")"
-                         style="@($"display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 12px; border-radius: 12px; cursor: pointer; border: 2px solid {(model.Role == "Guard" ? "white" : "rgba(255,255,255,0.15)")}; background: {(model.Role == "Guard" ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.05)")};")">
+                    <div @onclick="@(() => model.Role = "guard")"
+                         style="@($"display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 12px; border-radius: 12px; cursor: pointer; border: 2px solid {(model.Role == "guard" ? "white" : "rgba(255,255,255,0.15)")}; background: {(model.Role == "guard" ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.05)")};")">
                         <MudIcon Icon="@Icons.Material.Filled.Security"
-                                 Style="@($"font-size: 32px; margin-bottom: 8px; color: {(model.Role == "Guard" ? "white" : "rgba(255,255,255,0.5)")}")" />
-                        <MudText Style="@($"font-size: 0.8rem; font-weight: {(model.Role == "Guard" ? "700" : "400")}; color: {(model.Role == "Guard" ? "white" : "rgba(255,255,255,0.6)")}")">Guard</MudText>
+                                 Style="@($"font-size: 32px; margin-bottom: 8px; color: {(model.Role == "guard" ? "white" : "rgba(255,255,255,0.5)")}")" />
+                        <MudText Style="@($"font-size: 0.8rem; font-weight: {(model.Role == "guard" ? "700" : "400")}; color: {(model.Role == "guard" ? "white" : "rgba(255,255,255,0.6)")}")">Guard</MudText>
                     </div>
 
-                    <div @onclick="@(() => model.Role = "SAO")"
-                         style="@($"display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 12px; border-radius: 12px; cursor: pointer; border: 2px solid {(model.Role == "SAO" ? "white" : "rgba(255,255,255,0.15)")}; background: {(model.Role == "SAO" ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.05)")};")">
+                    <div @onclick="@(() => model.Role = "sao")"
+                         style="@($"display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 12px; border-radius: 12px; cursor: pointer; border: 2px solid {(model.Role == "sao" ? "white" : "rgba(255,255,255,0.15)")}; background: {(model.Role == "sao" ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.05)")};")">
                         <MudIcon Icon="@Icons.Material.Filled.AdminPanelSettings"
-                                 Style="@($"font-size: 32px; margin-bottom: 8px; color: {(model.Role == "SAO" ? "white" : "rgba(255,255,255,0.5)")}")" />
-                        <MudText Style="@($"font-size: 0.8rem; font-weight: {(model.Role == "SAO" ? "700" : "400")}; color: {(model.Role == "SAO" ? "white" : "rgba(255,255,255,0.6)")}")">SAO</MudText>
+                                 Style="@($"font-size: 32px; margin-bottom: 8px; color: {(model.Role == "sao" ? "white" : "rgba(255,255,255,0.5)")}")" />
+                        <MudText Style="@($"font-size: 0.8rem; font-weight: {(model.Role == "sao" ? "700" : "400")}; color: {(model.Role == "sao" ? "white" : "rgba(255,255,255,0.6)")}")">SAO</MudText>
                     </div>
 
-                    <div @onclick="@(() => model.Role = "Guidance")"
-                         style="@($"display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 12px; border-radius: 12px; cursor: pointer; border: 2px solid {(model.Role == "Guidance" ? "white" : "rgba(255,255,255,0.15)")}; background: {(model.Role == "Guidance" ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.05)")};")">
+                    <div @onclick="@(() => model.Role = "guidance")"
+                         style="@($"display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 12px; border-radius: 12px; cursor: pointer; border: 2px solid {(model.Role == "guidance" ? "white" : "rgba(255,255,255,0.15)")}; background: {(model.Role == "guidance" ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.05)")};")">
                         <MudIcon Icon="@Icons.Material.Filled.SupervisorAccount"
-                                 Style="@($"font-size: 32px; margin-bottom: 8px; color: {(model.Role == "Guidance" ? "white" : "rgba(255,255,255,0.5)")}")" />
-                        <MudText Style="@($"font-size: 0.8rem; font-weight: {(model.Role == "Guidance" ? "700" : "400")}; color: {(model.Role == "Guidance" ? "white" : "rgba(255,255,255,0.6)")}")">Guidance</MudText>
+                                 Style="@($"font-size: 32px; margin-bottom: 8px; color: {(model.Role == "guidance" ? "white" : "rgba(255,255,255,0.5)")}")" />
+                        <MudText Style="@($"font-size: 0.8rem; font-weight: {(model.Role == "guidance" ? "700" : "400")}; color: {(model.Role == "guidance" ? "white" : "rgba(255,255,255,0.6)")}")">Guidance</MudText>
                     </div>
 
                 </div>
 
-                
+
                 <MudText Typo="Typo.overline"
                          Style="color:  #FAFAFA; letter-spacing: 2px;">
                     Account Info
@@ -117,7 +116,7 @@
                               Class="mb-8"
                               InputStyle="color: white;" Style="color:#FAFAFA;" />
 
-                
+
                 <MudText Typo="Typo.overline"
                          Style="color: #FAFAFA; letter-spacing: 2px;">
                     Personal Info
@@ -143,13 +142,13 @@
                                    Style="color:  #FAFAFA;"
                                    InputStyle="color: white;" />
 
+                    @* Fixed: API only accepts male or female (lowercase) *@
                     <MudSelect T="string" Label="Gender"
                                @bind-Value="model.Gender"
                                Variant="Variant.Outlined"
                                Style="color:  #FAFAFA;" InputStyle="color: white;">
-                        <MudSelectItem Value="@("Male")">Male</MudSelectItem>
-                        <MudSelectItem Value="@("Female")">Female</MudSelectItem>
-                        <MudSelectItem Value="@("Other")">Other</MudSelectItem>
+                        <MudSelectItem Value="@("male")">Male</MudSelectItem>
+                        <MudSelectItem Value="@("female")">Female</MudSelectItem>
                     </MudSelect>
                 </div>
 
@@ -162,7 +161,8 @@
                                   AdornmentIcon="@Icons.Material.Filled.Home"
                                   InputStyle="color: white;" Style="color: #FAFAFA;" />
 
-                    <MudTextField T="string" Label="Phone Number"
+                    @* Fixed: Must start with 09 and be exactly 11 digits *@
+                    <MudTextField T="string" Label="Phone Number (09XXXXXXXXX)"
                                   @bind-Value="model.Number"
                                   Required="true" RequiredError="Required"
                                   Variant="Variant.Outlined"
@@ -172,7 +172,7 @@
                 </div>
 
                 @* student_info *@
-                @if (model.Role == "Student")
+                @if (model.Role == "student")
                 {
                     <MudText Typo="Typo.overline"
                              Style="color:  #FAFAFA; letter-spacing: 2px;">
@@ -181,7 +181,7 @@
                     <MudDivider Style="border-color: rgba(255,255,255,0.15); margin-bottom: 20px;" />
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 36px;">
-                        <MudTextField T="string" Label="Student No."
+                        <MudTextField T="string" Label="Student No. (C26-01-0001-MAN121)"
                                       @bind-Value="model.StudentNo"
                                       Required="true" RequiredError="Required"
                                       Variant="Variant.Outlined"
@@ -189,22 +189,28 @@
                                       AdornmentIcon="@Icons.Material.Filled.Badge"
                                       InputStyle="color: white;" Style="color: #FAFAFA;" />
 
-                        <MudTextField T="string" Label="Course"
-                                      @bind-Value="model.Course"
-                                      Required="true" RequiredError="Required"
-                                      Variant="Variant.Outlined"
-                                      Adornment="Adornment.Start"
-                                      AdornmentIcon="@Icons.Material.Filled.MenuBook"
-                                      InputStyle="color: white;" Style="color: #FAFAFA;" />
+                       
+                        <MudSelect T="string" Label="Course"
+                                   @bind-Value="model.Course"
+                                   Required="true" RequiredError="Required"
+                                   Variant="Variant.Outlined"
+                                   Adornment="Adornment.Start"
+                                   AdornmentIcon="@Icons.Material.Filled.MenuBook"
+                                   InputStyle="color: white;" Style="color: #FAFAFA;">
+                            <MudSelectItem Value="@("BSIT")">BSIT</MudSelectItem>
+                            <MudSelectItem Value="@("BSHM")">BSHM</MudSelectItem>
+                            <MudSelectItem Value="@("BSBA")">BSBA</MudSelectItem>
+                        </MudSelect>
 
+                        
                         <MudSelect T="string" Label="Year Level"
                                    @bind-Value="model.Year"
                                    Variant="Variant.Outlined"
                                    Style="color:  #FAFAFA" InputStyle="color: white;">
-                            <MudSelectItem Value="@("1st Year")">1st Year</MudSelectItem>
-                            <MudSelectItem Value="@("2nd Year")">2nd Year</MudSelectItem>
-                            <MudSelectItem Value="@("3rd Year")">3rd Year</MudSelectItem>
-                            <MudSelectItem Value="@("4th Year")">4th Year</MudSelectItem>
+                            <MudSelectItem Value="@("1")">1st Year</MudSelectItem>
+                            <MudSelectItem Value="@("2")">2nd Year</MudSelectItem>
+                            <MudSelectItem Value="@("3")">3rd Year</MudSelectItem>
+                            <MudSelectItem Value="@("4")">4th Year</MudSelectItem>
                         </MudSelect>
                     </div>
                 }
@@ -273,35 +279,52 @@
     {
         await form.Validate();
         if (!isValid) return;
+        if (string.IsNullOrEmpty(model.Role))
+        {
+            Snackbar.Add("Please select a role.", Severity.Warning);
+            return;
+        }
 
         isLoading = true;
 
-        
-        // if (model.Role == "Student")
-        //     await AuthService.RegisterStudentAsync(model);
-        // else
-        //     await AuthService.RegisterStaffAsync(model);
+        try
+        {
+            var registerModel = new RegisterModel
+            {
+                Username = model.Username.Trim(),
+                Password = model.Password.Trim(),
+                Email = model.Email.Trim().ToLower(),
+                FirstName = model.FirstName.Trim(),
+                LastName = model.LastName.Trim(),
+                DateOfBirth = model.DateOfBirth,
+                Gender = model.Gender.ToLower(),
+                Address = model.Address.Trim(),
+                Number = model.Number.Trim(),
+                Role = model.Role.ToLower(),
+                StudentNo = model.Role == "student" ? model.StudentNo?.Trim().ToUpper() : null,
+                Course = model.Role == "student" ? model.Course?.Trim().ToUpper() : null,
+                Year = model.Role == "student" ? model.Year?.Trim() : null
+            };
 
-        Snackbar.Add("Account created successfully!", Severity.Success);
-        Nav.NavigateTo("/login");
+            var result = await AuthService.RegisterAsync(registerModel);
 
-        isLoading = false;
-    }
-
-    class RegisterModel
-    {
-        public string Username { get; set; } = "";
-        public string Password { get; set; } = "";
-        public string Email { get; set; } = "";
-        public string FirstName { get; set; } = "";
-        public string LastName { get; set; } = "";
-        public DateTime? DateOfBirth { get; set; }
-        public string Gender { get; set; } = "";
-        public string Address { get; set; } = "";
-        public string Number { get; set; } = "";
-        public string Role { get; set; } = "";
-        public string StudentNo { get; set; } = "";
-        public string Course { get; set; } = "";
-        public string Year { get; set; } = "";
+            if (result != null && result.Status == 200)
+            {
+                Snackbar.Add("Account created successfully!", Severity.Success);
+                Nav.NavigateTo("/login");
+            }
+            else
+            {
+                Snackbar.Add(result?.Message ?? "Registration failed. Please try again.", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Connection error: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isLoading = false;
+        }
     }
 }

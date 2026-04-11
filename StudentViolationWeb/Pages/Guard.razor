@@ -1,0 +1,91 @@
+﻿@page "/guard"
+@inject HttpClient Http
+@inject ISnackbar Snackbar
+@inject GuardService GuardService
+
+<MudContainer>
+
+    <MudText Typo="Typo.h4">Guard Dashboard</MudText>
+
+    
+    <MudTextField @bind-Value="qrInput" Label="Scan QR Code" Immediate="true" />
+
+    <MudButton OnClick="ValidateStudent">Validate</MudButton>
+
+    @if (student != null)
+    {
+        <MudCard Class="mt-4">
+            <MudCardContent>
+                <MudText>@student.FullName</MudText>
+                <MudText>@student.StudentNo</MudText>
+                <MudText>Violations: @student.ViolationCount</MudText>
+
+                <MudChip T="string" Color="@GetColor(student.WarningLevel)">
+                    @student.WarningLevel
+                </MudChip>
+
+                <MudSelect T="string" @bind-Value="selectedType" Label="Violation Type">
+                    <MudSelectItem Value="@("Late")">Late</MudSelectItem>n
+                    <MudSelectItem Value="@("No ID")">No ID</MudSelectItem>
+                </MudSelect>
+
+                <MudSelect T="string" @bind-Value="severity" Label="Severity">
+                    <MudSelectItem Value="@("minor")">Minor</MudSelectItem>
+                    <MudSelectItem Value="@("moderate")">Moderate</MudSelectItem>
+                    <MudSelectItem Value="@("major")">Major</MudSelectItem>
+                </MudSelect>
+
+                <MudButton OnClick="RecordViolation" Color="Color.Error">
+                    Record Violation
+                </MudButton>
+            </MudCardContent>
+        </MudCard>
+    }
+
+</MudContainer>
+
+@code {
+    string qrInput = "";
+    GuardStudent? student;
+
+    string selectedType = "";
+    string severity = "";
+
+    async Task ValidateStudent()
+    {
+        student = await Http.GetFromJsonAsync<GuardStudent>(
+            $"api/guard/student/validate?qrCode={qrInput}");
+    }
+
+    async Task RecordViolation()
+    {
+        var body = new
+        {
+            studentNo = student.StudentNo,
+            type = selectedType,
+            severity = severity
+        };
+
+        var res = await Http.PostAsJsonAsync("api/guard/student/violation", body);
+
+        if (res.IsSuccessStatusCode)
+            Snackbar.Add("Violation recorded", Severity.Success);
+    }
+
+    Color GetColor(string level) => level switch
+    {
+        "Safe" => Color.Success,
+        "Warning" => Color.Warning,
+        "Danger" => Color.Error,
+        "Critical" => Color.Dark,
+        _ => Color.Default
+    };
+
+    class GuardStudent
+    {
+        public string FullName { get; set; }
+        public string StudentNo { get; set; }
+        public int ViolationCount { get; set; }
+        public string WarningLevel { get; set; }
+    }
+}
