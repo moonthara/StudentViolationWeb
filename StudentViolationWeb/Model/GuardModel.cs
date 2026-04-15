@@ -2,7 +2,7 @@
 {
     public class RecordViolationModel
     {
-        public int StudentNo { get; set; }
+        public string StudentNo { get; set; } = string.Empty;
         public int ViolationType { get; set; }
         public string Details { get; set; }
         public string Severity { get; set; }
