@@ -1,34 +1,31 @@
-﻿@page "/student"
+@page "/student"
 
 @inject NavigationManager Nav
-@inject HttpClient Http
 @inject AuthService AuthService
+@inject StudentService StudentService
 @inject ISnackbar Snackbar
 
-<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 16px; min-width: 80px; background: #1565c0;">
+<MudLayout Style="background: linear-gradient(#4988C4);">
+    <MudAppBar Elevation="0" Style="background: rgba(255, 255, 255, 0.15) !important; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);">
 
-    <MudLayout Style="background: linear-gradient(#4988C4);">
-        <MudAppBar Elevation="0" Style="background: rgba(255, 255, 255, 0.15) !important; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);">
+        <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
+                       Style="color: #F9F7F7"
+                       Edge="Edge.Start"
+                       OnClick="GoBack" />
 
-            <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
-                           Style="color: #F9F7F7"
-                           Edge="Edge.Start"
-                           OnClick="GoBack" />
+        <MudSpacer />
 
-            <MudSpacer />
+        <MudText Typo="Typo.h6" Style="font-weight: 600; letter-spacing: 0.5px; color: #F9F7F7;">
+            Student Dashboard
+        </MudText>
 
-            <MudText Typo="Typo.h6" Style="font-weight: 600; letter-spacing: 0.5px; color: #F9F7F7;">
-                Student Dashboard
-            </MudText>
+        <MudSpacer />
 
-            <MudSpacer />
-
-            <MudIconButton Icon="@Icons.Material.Filled.Logout"
-                           Style="color: #F9F7F7"
-                           Edge="Edge.End"
-                           OnClick="Logout" />
-        </MudAppBar>
-    </MudLayout>
+        <MudIconButton Icon="@Icons.Material.Filled.Logout"
+                       Style="color: #F9F7F7"
+                       Edge="Edge.End"
+                       OnClick="Logout" />
+    </MudAppBar>
 
     <MudMainContent>
         <MudTabs @bind-ActivePanelIndex="_activeTab"
@@ -94,7 +91,7 @@
                             </MudItem>
                         </MudGrid>
 
-                        <!-- ✅ WARNING LEVEL (Fixed Style Attributes) -->
+                        <!-- Warning Level -->
                         <MudPaper Class="pa-3 mb-3"
                                   Style="@($"border-radius:10px; background:{GetWarningLevelBgColor()};")">
                             <div style="display:flex; align-items:center; gap:10px;">
@@ -148,7 +145,7 @@
                 </ChildContent>
             </MudTabPanel>
 
-            <!-- ========== PROFILE TAB (Mapped to StudentModel.cs) ========== -->
+            <!-- ========== PROFILE TAB ========== -->
             <MudTabPanel>
                 <TabContent>
                     <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; width: 33vw; padding: 8px 0;">
@@ -238,7 +235,7 @@
 
         </MudTabs>
     </MudMainContent>
-</div>
+</MudLayout>
 
 @code {
     private int _activeTab = 0;
@@ -258,13 +255,18 @@
     {
         try
         {
-            // Load current student profile
-            _student = await Http.GetFromJsonAsync<StudentModel>("api/students/current");
+            var studentResult = await StudentService.GetCurrentStudentAsync();
+            if (studentResult.Status == 200)
+                _student = studentResult.Data;
+            else
+                Snackbar.Add($"Error loading profile: {studentResult.Message}", Severity.Error);
 
-            // Load student violations
-            _violations = await Http.GetFromJsonAsync<List<ViolationModel>>("api/violations/student") ?? new();
+            var violationsResult = await StudentService.GetStudentViolationsAsync();
+            if (violationsResult.Status == 200)
+                _violations = violationsResult.Data ?? new();
+            else
+                Snackbar.Add($"Error loading violations: {violationsResult.Message}", Severity.Warning);
 
-            // Calculate statistics
             _totalViolations = _violations.Count;
             _pendingViolations = _violations.Count(v => v.Status == "Pending");
             _approvedViolations = _violations.Count(v => v.Status == "Approved");
@@ -272,11 +274,10 @@
         }
         catch (Exception ex)
         {
-            Snackbar.Add($"Error loading  {ex.Message}", Severity.Error);
+            Snackbar.Add($"Error loading data: {ex.Message}", Severity.Error);
         }
     }
 
-    // ✅ DYNAMIC WARNING LEVEL LOGIC
     private string GetWarningLevelText() => _totalViolations switch
     {
         <= 2 => "Green",
@@ -312,7 +313,6 @@
         _ => "Immediate attention required"
     };
 
-    // ✅ Status Chip Styling
     private string GetStatusStyle(string status) => status switch
     {
         "Approved" => "background:#e8f5e9; color:#4CAF50; font-size:0.7rem; height:22px; margin-top:4px;",
@@ -321,5 +321,10 @@
     };
 
     private void GoBack() => Nav.NavigateTo("/");
-    private void Logout() => Nav.NavigateTo("/login");
+
+    private async Task Logout()
+    {
+        await AuthService.Logout();
+        Nav.NavigateTo("/login");
+    }
 }

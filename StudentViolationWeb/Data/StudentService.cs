@@ -25,6 +25,34 @@ public class StudentService
         }
     }
 
+    public async Task<ServiceResponse<StudentModel>> GetCurrentStudentAsync()
+    {
+        try
+        {
+            var response = await _http.GetAsync("api/students/current");
+            var result = await response.Content.ReadFromJsonAsync<ServiceResponse<StudentModel>>();
+            return result ?? new ServiceResponse<StudentModel> { Status = 500, Message = "Empty response" };
+        }
+        catch (Exception ex)
+        {
+            return new ServiceResponse<StudentModel> { Status = 500, Message = ex.Message };
+        }
+    }
+
+    public async Task<ServiceResponse<List<ViolationModel>>> GetStudentViolationsAsync()
+    {
+        try
+        {
+            var response = await _http.GetAsync("api/violations/student");
+            var result = await response.Content.ReadFromJsonAsync<ServiceResponse<List<ViolationModel>>>();
+            return result ?? new ServiceResponse<List<ViolationModel>> { Status = 500, Message = "Empty response" };
+        }
+        catch (Exception ex)
+        {
+            return new ServiceResponse<List<ViolationModel>> { Status = 500, Message = ex.Message };
+        }
+    }
+
     public async Task<ServiceResponse<object>> CreateStudent(RegisterModel model)
     {
         try
