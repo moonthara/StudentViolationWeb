@@ -11,7 +11,20 @@ public class GuardService
         _http = http;
     }
 
-    public async Task<ServiceResponse<RecordViolationModel>> RecordViolation(RecordViolationModel model)
+    public async Task<ServiceResponse<StudentModel>> ValidateStudentAsync(string studentNo)
+    {
+        try
+        {
+            var response = await _http.GetAsync($"api/guards/student/validate?qrCode={Uri.EscapeDataString(studentNo)}");
+            var result = await response.Content.ReadFromJsonAsync<ServiceResponse<StudentModel>>();
+            return result ?? new ServiceResponse<StudentModel> { Status = 500, Message = "Empty response" };
+        }
+        catch (Exception ex)
+        {
+            return new ServiceResponse<StudentModel> { Status = 500, Message = ex.Message };
+        }
+    }
+    public async Task<ServiceResponse<RecordViolationModel>> RecordViolationAsync(RecordViolationModel model)
     {
         try
         {

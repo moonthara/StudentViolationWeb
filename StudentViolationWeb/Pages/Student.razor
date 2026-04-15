@@ -1,9 +1,9 @@
 ﻿@page "/student"
-
 @inject NavigationManager Nav
 @inject HttpClient Http
 @inject AuthService AuthService
 @inject ISnackbar Snackbar
+@inject StudentService StudentService
 
 <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 16px; min-width: 80px; background: #1565c0;">
 
@@ -38,7 +38,7 @@
                  SliderColor="Color.Error"
                  PanelClass="pa-4">
 
-            <!-- ========== DASHBOARD TAB ========== -->
+            
             <MudTabPanel>
                 <TabContent>
                     <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; width: 33vw; padding: 8px 0;">
@@ -49,7 +49,7 @@
                 <ChildContent>
                     <MudContainer MaxWidth="MaxWidth.False" Class="pa-3">
 
-                        <!-- Welcome Card -->
+                        
                         <MudPaper Style="background: linear-gradient(135deg, #1a237e 0%, #283593 60%, #1565c0 100%); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
                             <div style="display:flex; align-items:center; gap:16px;">
                                 <MudAvatar Style="background:rgba(255,255,255,0.2); width:48px; height:48px;">
@@ -66,7 +66,7 @@
                             </div>
                         </MudPaper>
 
-                        <!-- Stats Grid -->
+                        
                         <MudGrid Class="mb-3" Spacing="2">
                             <MudItem xs="3">
                                 <MudPaper Class="pa-3" Style="border-radius:10px; text-align:center;">
@@ -94,7 +94,7 @@
                             </MudItem>
                         </MudGrid>
 
-                        <!-- ✅ WARNING LEVEL (Fixed Style Attributes) -->
+                        >
                         <MudPaper Class="pa-3 mb-3"
                                   Style="@($"border-radius:10px; background:{GetWarningLevelBgColor()};")">
                             <div style="display:flex; align-items:center; gap:10px;">
@@ -111,13 +111,13 @@
                             </div>
                         </MudPaper>
 
-                        <!-- Violation History Header -->
+                        
                         <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
                             <div style="width:4px; height:20px; background:#1a237e; border-radius:2px;"></div>
                             <MudText Style="font-weight:700; font-size:1rem; color:#212121;">Violation History</MudText>
                         </div>
 
-                        <!-- Violation List -->
+                        
                         @if (_violations?.Any() == true)
                         {
                             @foreach (var v in _violations)
@@ -148,7 +148,7 @@
                 </ChildContent>
             </MudTabPanel>
 
-            <!-- ========== PROFILE TAB (Mapped to StudentModel.cs) ========== -->
+            
             <MudTabPanel>
                 <TabContent>
                     <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; width: 33vw; padding: 8px 0;">
@@ -202,7 +202,7 @@
                 </ChildContent>
             </MudTabPanel>
 
-            <!-- ========== QR CODE TAB ========== -->
+            
             <MudTabPanel>
                 <TabContent>
                     <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; width: 33vw; padding: 8px 0;">
@@ -258,13 +258,13 @@
     {
         try
         {
-            // Load current student profile
+            
             _student = await Http.GetFromJsonAsync<StudentModel>("api/students/current");
 
-            // Load student violations
+            
             _violations = await Http.GetFromJsonAsync<List<ViolationModel>>("api/violations/student") ?? new();
 
-            // Calculate statistics
+            
             _totalViolations = _violations.Count;
             _pendingViolations = _violations.Count(v => v.Status == "Pending");
             _approvedViolations = _violations.Count(v => v.Status == "Approved");
@@ -276,7 +276,7 @@
         }
     }
 
-    // ✅ DYNAMIC WARNING LEVEL LOGIC
+    
     private string GetWarningLevelText() => _totalViolations switch
     {
         <= 2 => "Green",
@@ -312,7 +312,7 @@
         _ => "Immediate attention required"
     };
 
-    // ✅ Status Chip Styling
+
     private string GetStatusStyle(string status) => status switch
     {
         "Approved" => "background:#e8f5e9; color:#4CAF50; font-size:0.7rem; height:22px; margin-top:4px;",
@@ -321,5 +321,10 @@
     };
 
     private void GoBack() => Nav.NavigateTo("/");
-    private void Logout() => Nav.NavigateTo("/login");
+
+    private async Task Logout()
+    {
+        await AuthService.Logout();
+        Nav.NavigateTo("/login");
+    }
 }

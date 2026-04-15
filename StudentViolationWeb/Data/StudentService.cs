@@ -25,17 +25,17 @@ public class StudentService
         }
     }
 
-    public async Task<ServiceResponse<object>> CreateStudent(RegisterModel model)
+    public async Task<ServiceResponse<StudentModel>> GetCurrentStudentAsync()
     {
         try
         {
-            var response = await _http.PostAsJsonAsync("api/students", model);
-            var result = await response.Content.ReadFromJsonAsync<ServiceResponse<object>>();
-            return result ?? new ServiceResponse<object> { Status = 500, Message = "Empty response" };
+            var response = await _http.GetAsync("api/students/current");
+            var result = await response.Content.ReadFromJsonAsync<ServiceResponse<StudentModel>>();
+            return result ?? new ServiceResponse<StudentModel> { Status = 500, Message = "Empty response" };
         }
         catch (Exception ex)
         {
-            return new ServiceResponse<object> { Status = 500, Message = ex.Message };
+            return new ServiceResponse<StudentModel> { Status = 500, Message = ex.Message };
         }
     }
 }

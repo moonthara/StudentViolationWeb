@@ -1,91 +1,205 @@
-﻿@page "/guard"
-@inject HttpClient Http
-@inject ISnackbar Snackbar
+﻿@page "/guard/"
+
+@inject NavigationManager Nav
+@inject AuthService AuthService
 @inject GuardService GuardService
+@inject ISnackbar Snackbar
+<PageTitle>Guard Dashboard</PageTitle>
 
-<MudContainer>
+<MudLayout>
+    <!-- TOP APP BAR: Clean White/Glass -->
+    <MudAppBar Elevation="0" Style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); border-bottom: 1px solid #E1F5FE;">
+        <MudText Typo="Typo.h6" Style="font-weight:600; color: #0288D1; letter-spacing:0.01em;">Guard Dashboard</MudText>
+        <MudSpacer />
+        <MudChip T="string" Size="Size.Small" Style="background: #E1F5FE; color: #0288D1; border: 1px solid #B3E5FC; font-weight: 600;">ACLC</MudChip>
+        <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" OnClick="Logout" Style="color: #546E7A;" />
+    </MudAppBar>
 
-    <MudText Typo="Typo.h4">Guard Dashboard</MudText>
+    <!-- MAIN CONTENT: Soft Light Blue Background -->
+    <MudMainContent Style="background: #F4F9FD; min-height: 100vh; padding-bottom: 80px;">
 
-    
-    <MudTextField @bind-Value="qrInput" Label="Scan QR Code" Immediate="true" />
+        <!-- AESTHETIC BACKGROUND EFFECTS -->
+        <!-- Soft Blue Gradients -->
+        <div style="position:fixed; inset:0; background: radial-gradient(ellipse 60% 50% at 0% 0%, #E1F5FE 0%, transparent 60%), radial-gradient(ellipse 40% 40% at 100% 100%, #B3E5FC 0%, transparent 60%); pointer-events:none; z-index:0;"></div>
+        <!-- Soft Dot Pattern -->
+        <div style="position:fixed; inset:0; background-image: radial-gradient(#B3E5FC 1px, transparent 1px); background-size: 24px 24px; pointer-events:none; z-index:0; opacity: 0.6;"></div>
 
-    <MudButton OnClick="ValidateStudent">Validate</MudButton>
+        <MudContainer MaxWidth="MaxWidth.Small" Style="position:relative; z-index:1; padding-top:16px;">
 
-    @if (student != null)
-    {
-        <MudCard Class="mt-4">
-            <MudCardContent>
-                <MudText>@student.FullName</MudText>
-                <MudText>@student.StudentNo</MudText>
-                <MudText>Violations: @student.ViolationCount</MudText>
+            <!-- WELCOME BANNER -->
+            <div style="background: linear-gradient(135deg, #FFFFFF, #E1F5FE); border: 1px solid #B3E5FC; border-radius: 16px; padding: 16px 20px; margin-bottom: 20px; display:flex; align-items:center; gap:16px; box-shadow: 0 4px 12px rgba(2, 136, 209, 0.08);">
+                <div style="width:44px; height:44px; border-radius:12px; background: #0288D1; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow: 0 4px 8px rgba(2, 136, 209, 0.2);">
+                    <MudIcon Icon="@Icons.Material.Filled.Shield" Style="color: #FFFFFF;" />
+                </div>
+                <div>
+                    <MudText Typo="Typo.subtitle1" Style="font-weight:600; color: #0288D1;">Welcome, Login successful!</MudText>
+                    <MudText Typo="Typo.caption" Style="color: #546E7A;">Tap the QR button to scan or enter a student number</MudText>
+                </div>
+            </div>
 
-                <MudChip T="string" Color="@GetColor(student.WarningLevel)">
-                    @student.WarningLevel
-                </MudChip>
+            <!-- NAV TABS: White Surface with Blue Accents -->
+            <MudTabs @bind-ActivePanelIndex="_activeTab"
+                     Elevation="0"
+                     Style="background: #FFFFFF; border-radius: 12px; border: 1px solid #E1F5FE; padding: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);"
+                     TabPanelClass="pa-0"
+                     SliderColor="Color.Primary"
+                     PanelClass="pt-4">
 
-                <MudSelect T="string" @bind-Value="selectedType" Label="Violation Type">
-                    <MudSelectItem Value="@("Late")">Late</MudSelectItem>n
-                    <MudSelectItem Value="@("No ID")">No ID</MudSelectItem>
-                </MudSelect>
+                <!-- TAB 1: RECORD VIOLATION -->
+                <MudTabPanel Text="Record" Icon="@Icons.Material.Filled.AddCircle">
+                    <RecordViolationTab />
+                </MudTabPanel>
 
-                <MudSelect T="string" @bind-Value="severity" Label="Severity">
-                    <MudSelectItem Value="@("minor")">Minor</MudSelectItem>
-                    <MudSelectItem Value="@("moderate")">Moderate</MudSelectItem>
-                    <MudSelectItem Value="@("major")">Major</MudSelectItem>
-                </MudSelect>
+                <!-- TAB 2: VIOLATION HISTORY -->
+                <MudTabPanel Text="History" Icon="@Icons.Material.Filled.History">
+                    <ViolationHistoryTab />
+                </MudTabPanel>
 
-                <MudButton OnClick="RecordViolation" Color="Color.Error">
-                    Record Violation
-                </MudButton>
-            </MudCardContent>
-        </MudCard>
-    }
+                <!-- TAB 3: SUMMARY -->
+                <MudTabPanel Text="Summary" Icon="@Icons.Material.Filled.BarChart">
+                    <ViolationSummaryTab />
+                </MudTabPanel>
 
-</MudContainer>
+                <!-- TAB 4: ALL STUDENTS -->
+                <MudTabPanel Text="Students" Icon="@Icons.Material.Filled.People">
+                    <AllStudentsTab />
+                </MudTabPanel>
+
+            </MudTabs>
+        </MudContainer>
+    </MudMainContent>
+
+    <!-- BOTTOM FAB - QR SCANNER -->
+    <div style="position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:200;">
+        <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.QrCodeScanner"
+                Style="background: linear-gradient(135deg, #29B6F6, #0288D1); box-shadow: 0 8px 24px rgba(2, 136, 209, 0.35);"
+                OnClick="OpenQrModal" />
+    </div>
+
+    <!-- QR SCANNER DIALOG -->
+    <MudDialog @bind-IsVisible="_qrModalOpen" Options="_qrDialogOptions">
+        <TitleContent>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <MudIcon Icon="@Icons.Material.Filled.QrCodeScanner" Style="color: #0288D1;" />
+                <MudText Typo="Typo.h6" Style="color: #37474F; font-weight: 600;">
+                    Validate Student
+                </MudText>
+            </div>
+        </TitleContent>
+        <DialogContent>
+            <!-- Camera Placeholder -->
+            <div style="background: #F0F8FF; border: 2px dashed #B3E5FC; border-radius:14px; padding:20px; display:flex; align-items:center; justify-content:center; min-height:130px; margin-bottom:16px;">
+                <div style="text-align:center; color: #546E7A;">
+                    <MudIcon Icon="@Icons.Material.Filled.QrCode" Style="font-size:44px; color: #B3E5FC;" />
+                    <MudText Typo="Typo.caption" Style="display:block; margin-top:6px;">Camera on mobile only</MudText>
+                </div>
+            </div>
+            
+            <MudText Typo="Typo.caption" Align="Align.Center" Style="color: #90A4AE; display:block; margin:10px 0; font-weight: 600;">OR enter manually</MudText>
+            
+            <!-- Input Field -->
+            <div style="background: #FFFFFF; border: 1px solid #E1F5FE; border-radius: 10px; padding: 4px;">
+                 <MudTextField @bind-Value="_manualStudentNo"
+                          Placeholder="e.g. C26-01-0001-MAN121"
+                          Variant="Variant.Text"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.School"
+                          AdornmentColor="Color.Primary"
+                          Style="width: 100%;" />
+            </div>
+
+            @if (_validateError != null)
+            {
+                <MudAlert Severity="Severity.Error" Style="margin-top:12px; background: #FFEBEE; color: #C62828; border:1px solid #FFCDD2; border-radius: 8px;">
+                    @_validateError
+                </MudAlert>
+            }
+            @if (_validatedStudent is not null)
+            {
+                var student = _validatedStudent;
+                <MudPaper Elevation="0" Style="background:#E8F5E9; border:1px solid #C8E6C9; border-radius:12px; padding:12px; margin-top:16px;">
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Style="color:#2E7D32;" />
+                        <div>
+                            <MudText Typo="Typo.subtitle2" Style="color:#2E7D32; font-weight:600;">✓ Student Found</MudText>
+                            <MudText Typo="Typo.body2" Style="color:#1B5E20;">@student.FirstName @student.LastName</MudText>
+                            <MudText Typo="Typo.caption" Style="color:#4CAF50;">@student.StudentNo · @student.Course @student.Year</MudText>
+                        </div>
+                    </MudStack>
+                </MudPaper>
+            }
+        </DialogContent>
+        <DialogActions>
+            <MudButton OnClick="CloseQrModal"
+                       Style="background: #F5F5F5; color: #455A64; border-radius:10px; border: 1px solid #E0E0E0;">
+                Close
+            </MudButton>
+            <MudButton Variant="Variant.Filled" OnClick="ValidateStudent"
+                       Disabled="_validating"
+                       Style="background: linear-gradient(135deg, #29B6F6, #0288D1); color: white; border-radius:10px; box-shadow: 0 4px 12px rgba(2, 136, 209, 0.25);">
+                @if (_validating)
+                {
+                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Style="color: white;" />
+                }
+                else
+                {
+                    <span>✓ Validate</span>
+                }
+            </MudButton>
+        </DialogActions>
+    </MudDialog>
+</MudLayout>
 
 @code {
-    string qrInput = "";
-    GuardStudent? student;
+    private int _activeTab = 0;
+    private bool _qrModalOpen = false;
+    private string _manualStudentNo = "";
+    private bool _validating = false;
+    private string? _validateError = null;
+    private StudentModel? _validatedStudent = null;
 
-    string selectedType = "";
-    string severity = "";
-
-    async Task ValidateStudent()
+    private DialogOptions _qrDialogOptions = new()
     {
-        student = await Http.GetFromJsonAsync<GuardStudent>(
-            $"api/guard/student/validate?qrCode={qrInput}");
-    }
-
-    async Task RecordViolation()
-    {
-        var body = new
-        {
-            studentNo = student.StudentNo,
-            type = selectedType,
-            severity = severity
-        };
-
-        var res = await Http.PostAsJsonAsync("api/guard/student/violation", body);
-
-        if (res.IsSuccessStatusCode)
-            Snackbar.Add("Violation recorded", Severity.Success);
-    }
-
-    Color GetColor(string level) => level switch
-    {
-        "Safe" => Color.Success,
-        "Warning" => Color.Warning,
-        "Danger" => Color.Error,
-        "Critical" => Color.Dark,
-        _ => Color.Default
+        MaxWidth = MaxWidth.ExtraSmall,
+        FullWidth = true,
+        BackdropClick = true,
+        CloseButton = false,
+        BackgroundClass = "qr-backdrop"
     };
 
-    class GuardStudent
+    private void OpenQrModal()
     {
-        public string FullName { get; set; }
-        public string StudentNo { get; set; }
-        public int ViolationCount { get; set; }
-        public string WarningLevel { get; set; }
+        _qrModalOpen = true;
+        _manualStudentNo = "";
+        _validateError = null;
+        _validatedStudent = null;
+    }
+
+    private void CloseQrModal() => _qrModalOpen = false;
+
+    private async Task ValidateStudent()
+    {
+        if (string.IsNullOrWhiteSpace(_manualStudentNo)) return;
+        _validating = true;
+        _validateError = null;
+        _validatedStudent = null;
+
+        var result = await GuardService.ValidateStudentAsync(_manualStudentNo.Trim().ToUpper());
+        _validating = false;
+
+        if (result.Status == 200 && result.Data != null)
+        {
+            _validatedStudent = result.Data;
+        }
+        else
+        {
+            _validateError = result.Message ?? "Student not found.";
+        }
+    }
+
+    private async Task Logout()
+    {
+        await AuthService.Logout();
+        Nav.NavigateTo("/login");
     }
 }

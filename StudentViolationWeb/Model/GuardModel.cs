@@ -2,11 +2,11 @@
 {
     public class RecordViolationModel
     {
-        public int StudentNo { get; set; }
+        public int StudentNo { get; set; } 
         public int ViolationType { get; set; }
-        public string Details { get; set; }
-        public string Severity { get; set; }
-        public string GuardId { get; set; }
+        public string Details { get; set; } = string.Empty;
+        public string Severity { get; set; } = string.Empty;
+        public string GuardId { get; set; } = string.Empty;
 
     }
     public class GetSummaryModel
@@ -15,4 +15,5 @@
         public DateTime EndDate { get; set; }
     }
 }
+
 
