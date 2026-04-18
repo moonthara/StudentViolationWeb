@@ -1,157 +1,611 @@
 ﻿@page "/guard/"
-
+@implements IDisposable
 @inject NavigationManager Nav
 @inject AuthService AuthService
 @inject GuardService GuardService
 @inject ISnackbar Snackbar
+
 <PageTitle>Guard Dashboard</PageTitle>
 
 <MudLayout>
-    <!-- TOP APP BAR: Clean White/Glass -->
-    <MudAppBar Elevation="0" Style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); border-bottom: 1px solid #E1F5FE;">
-        <MudText Typo="Typo.h6" Style="font-weight:600; color: #0288D1; letter-spacing:0.01em;">Guard Dashboard</MudText>
+
+    <!-- APP BAR -->
+    <MudAppBar Elevation="0"
+               Style="background:rgba(255,255,255,0.95);
+                      backdrop-filter:blur(20px);
+                      border-bottom:1px solid #E1F5FE;">
+
+        <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
+                       OnClick='() => Nav.NavigateTo("/login")'
+                       Style="color:#546E7A;" />
         <MudSpacer />
-        <MudChip T="string" Size="Size.Small" Style="background: #E1F5FE; color: #0288D1; border: 1px solid #B3E5FC; font-weight: 600;">ACLC</MudChip>
-        <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" OnClick="Logout" Style="color: #546E7A;" />
+
+        <MudText Typo="Typo.h6"
+                 Style="font-weight:700; color:#0288D1; letter-spacing:0.02em;">
+            Guard Dashboard
+        </MudText>
+
+        <MudSpacer />
+
+        <MudText Typo="Typo.caption"
+                 Style="color:#90A4AE; font-size:11px; margin-right:4px;">
+            @_currentTime
+        </MudText>
+
+        <MudBadge Content="@_notifCount" Color="Color.Error"
+                  Overlap="true" Visible="@(_notifCount > 0)">
+            <MudIconButton Icon="@Icons.Material.Filled.Notifications"
+                           OnClick="ToggleNotifications"
+                           Style="color:#546E7A;" />
+        </MudBadge>
+
+        <MudIconButton Icon="@Icons.Material.Filled.Logout"
+                       OnClick="Logout"
+                       Style="color:#546E7A;" />
     </MudAppBar>
 
-    <!-- MAIN CONTENT: Soft Light Blue Background -->
-    <MudMainContent Style="background: #F4F9FD; min-height: 100vh; padding-bottom: 80px;">
+   
 
-        <!-- AESTHETIC BACKGROUND EFFECTS -->
-        <!-- Soft Blue Gradients -->
-        <div style="position:fixed; inset:0; background: radial-gradient(ellipse 60% 50% at 0% 0%, #E1F5FE 0%, transparent 60%), radial-gradient(ellipse 40% 40% at 100% 100%, #B3E5FC 0%, transparent 60%); pointer-events:none; z-index:0;"></div>
-        <!-- Soft Dot Pattern -->
-        <div style="position:fixed; inset:0; background-image: radial-gradient(#B3E5FC 1px, transparent 1px); background-size: 24px 24px; pointer-events:none; z-index:0; opacity: 0.6;"></div>
-
-        <MudContainer MaxWidth="MaxWidth.Small" Style="position:relative; z-index:1; padding-top:16px;">
-
-            <!-- WELCOME BANNER -->
-            <div style="background: linear-gradient(135deg, #FFFFFF, #E1F5FE); border: 1px solid #B3E5FC; border-radius: 16px; padding: 16px 20px; margin-bottom: 20px; display:flex; align-items:center; gap:16px; box-shadow: 0 4px 12px rgba(2, 136, 209, 0.08);">
-                <div style="width:44px; height:44px; border-radius:12px; background: #0288D1; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow: 0 4px 8px rgba(2, 136, 209, 0.2);">
-                    <MudIcon Icon="@Icons.Material.Filled.Shield" Style="color: #FFFFFF;" />
+        @if (_notifications.Count == 0)
+        {
+            <div style="padding:24px; text-align:center; background:#FFFFFF;">
+                <MudIcon Icon="@Icons.Material.Filled.NotificationsNone"
+                         Style="color:#B0BEC5; font-size:36px;" />
+                <MudText Typo="Typo.caption"
+                         Style="display:block; color:#90A4AE; margin-top:6px;">
+                    No new notifications
+                </MudText>
+            </div>
+        }
+        else
+        {
+            @foreach (var n in _notifications)
+            {
+                <div style="padding:12px 16px; border-bottom:1px solid #F1F8FE;
+                                    background:#FFFFFF;
+                                    display:flex; gap:10px; align-items:flex-start;">
+                    <MudIcon Icon="@Icons.Material.Filled.Warning"
+                             Style="color:#F9A825; font-size:18px; flex-shrink:0; margin-top:2px;" />
+                    <div>
+                        <MudText Typo="Typo.body2"
+                                 Style="color:#1A237E; font-weight:600; font-size:12px;">
+                            @n.Title
+                        </MudText>
+                        <MudText Typo="Typo.caption" Style="color:#546E7A;">
+                            @n.Message
+                        </MudText>
+                    </div>
                 </div>
-                <div>
-                    <MudText Typo="Typo.subtitle1" Style="font-weight:600; color: #0288D1;">Welcome, Login successful!</MudText>
-                    <MudText Typo="Typo.caption" Style="color: #546E7A;">Tap the QR button to scan or enter a student number</MudText>
+            }
+        }
+    </MudPopover>
+
+    <!-- MAIN CONTENT -->
+    <MudMainContent Style="background:#F4F9FD; min-height:100vh; padding-bottom:80px;">
+
+        <div style="position:fixed; inset:0;
+                    background:
+                        radial-gradient(ellipse 60% 50% at 0% 0%,  #E1F5FE 0%, transparent 60%),
+                        radial-gradient(ellipse 40% 40% at 100% 100%, #B3E5FC 0%, transparent 60%);
+                    pointer-events:none; z-index:0;"></div>
+        <div style="position:fixed; inset:0;
+                    background-image:radial-gradient(#B3E5FC 1px, transparent 1px);
+                    background-size:24px 24px;
+                    pointer-events:none; z-index:0; opacity:0.45;"></div>
+
+        <div style="position:relative; z-index:1; padding:16px 16px 0;">
+
+            <!-- WELCOME BANNER (Record tab only) -->
+            @if (_activeTab == 0)
+            {
+                <div style="background:linear-gradient(135deg,#FFFFFF,#E1F5FE);
+                                border:1px solid #B3E5FC; border-radius:16px;
+                                padding:16px 20px; margin-bottom:18px;
+                                display:flex; align-items:center; gap:16px;
+                                box-shadow:0 4px 12px rgba(2,136,209,0.08);">
+                    <div style="width:44px; height:44px; border-radius:12px;
+                                    background:#0288D1;
+                                    display:flex; align-items:center; justify-content:center;
+                                    flex-shrink:0;
+                                    box-shadow:0 4px 8px rgba(2,136,209,0.25);">
+                        <MudIcon Icon="@Icons.Material.Filled.Shield"
+                                 Style="color:#FFFFFF; font-size:22px;" />
+                    </div>
+                    <div>
+                        <MudText Typo="Typo.subtitle1"
+                                 Style="font-weight:700; color:#0288D1; font-size:14px;">
+                            Welcome, Login successful!
+                        </MudText>
+                        <MudText Typo="Typo.caption"
+                                 Style="color:#546E7A; font-size:11px;">
+                            Tap the QR button to scan or enter a student number
+                        </MudText>
+                    </div>
                 </div>
+            }
+
+            <!-- PANEL HEADER -->
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+                <div style="width:4px; height:20px;
+                            background:@_accentColor;
+                            border-radius:4px;"></div>
+                <MudIcon Icon="@_panelIcon"
+                         Style="@($"color:{_accentColor}; font-size:19px;")" />
+                <MudText Typo="Typo.subtitle1"
+                         Style="font-weight:700; color:#1A237E; font-size:15px;">
+                    @_panelTitle
+                </MudText>
+                @if (_activeTab == 3)
+                {
+                    <MudText Typo="Typo.caption"
+                             Style="color:#90A4AE; font-size:11px; margin-left:2px;">
+                        — @_studentCount students registered
+                    </MudText>
+                }
             </div>
 
-            <!-- NAV TABS: White Surface with Blue Accents -->
-            <MudTabs @bind-ActivePanelIndex="_activeTab"
-                     Elevation="0"
-                     Style="background: #FFFFFF; border-radius: 12px; border: 1px solid #E1F5FE; padding: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);"
-                     TabPanelClass="pa-0"
-                     SliderColor="Color.Primary"
-                     PanelClass="pt-4">
+            <!-- ═══ TAB 0 — RECORD VIOLATION ═══ -->
+            @if (_activeTab == 0)
+            {
+                <div style="background:#FFFFFF; border:1px solid #E1F5FE;
+                                border-radius:16px;
+                                box-shadow:0 2px 10px rgba(2,136,209,0.06); overflow:hidden;">
 
-                <!-- TAB 1: RECORD VIOLATION -->
-                <MudTabPanel Text="Record" Icon="@Icons.Material.Filled.AddCircle">
-                    <RecordViolationTab />
-                </MudTabPanel>
+                    <div style="padding:14px 18px; border-bottom:1px solid #F0F7FF;">
+                        <MudText Typo="Typo.caption"
+                                 Style="font-size:10px; font-weight:600; color:#90A4AE;
+                                            text-transform:uppercase; letter-spacing:0.08em;
+                                            display:block; margin-bottom:6px;">
+                            Select Student
+                        </MudText>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <MudIcon Icon="@Icons.Material.Filled.PersonOutline"
+                                     Style="color:#90A4AE; font-size:18px;" />
+                            <MudSelect T="string" @bind-Value="_selectedViolationType"
+                                       Placeholder="Select type"
+                                       Variant="Variant.Text"
+                                       Style="flex:1;" Dense="true">
+                            </MudSelect>
+                        </div>
+                    </div>
 
-                <!-- TAB 2: VIOLATION HISTORY -->
-                <MudTabPanel Text="History" Icon="@Icons.Material.Filled.History">
-                    <ViolationHistoryTab />
-                </MudTabPanel>
+                    <div style="padding:14px 18px; border-bottom:1px solid #F0F7FF;">
+                        <MudText Typo="Typo.caption"
+                                 Style="font-size:10px; font-weight:600; color:#90A4AE;
+                                            text-transform:uppercase; letter-spacing:0.08em;
+                                            display:block; margin-bottom:6px;">
+                            Violation Type
+                        </MudText>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <MudIcon Icon="@Icons.Material.Filled.Warning"
+                                     Style="color:#90A4AE; font-size:18px;" />
+                            <MudSelect T="string" @bind-Value="_selectedViolationType"
+                                       Placeholder="Select type"
+                                       Variant="Variant.Text"
+                                       Style="flex:1;" Dense="true">
+                                <MudSelectItem Value='"No ID"'>No ID</MudSelectItem>
+                                <MudSelectItem Value='"No Uniform"'>No Uniform</MudSelectItem>
+                                <MudSelectItem Value='"Piercing"'>Piercing</MudSelectItem>
+                                <MudSelectItem Value='"Colored Hair"'>Colored Hair</MudSelectItem>
+                                <MudSelectItem Value='"Late"'>Late</MudSelectItem>
+                                <MudSelectItem Value='"Cutting Class"'>Cutting Class</MudSelectItem>
+                                <MudSelectItem Value='"Disruptive Behavior"'>Disruptive Behavior</MudSelectItem>
+                                <MudSelectItem Value='"Vandalism"'>Vandalism</MudSelectItem>
+                                <MudSelectItem Value='"Prohibited Items"'>Prohibited Items</MudSelectItem>
+                                <MudSelectItem Value='"Other"'>Other</MudSelectItem>
+                            </MudSelect>
+                       
+                        </div>
+                    </div>
 
-                <!-- TAB 3: SUMMARY -->
-                <MudTabPanel Text="Summary" Icon="@Icons.Material.Filled.BarChart">
-                    <ViolationSummaryTab />
-                </MudTabPanel>
+                    <div style="padding:14px 18px; border-bottom:1px solid #F0F7FF;">
+                        <MudText Typo="Typo.caption"
+                                 Style="font-size:10px; font-weight:600; color:#90A4AE;
+                                            text-transform:uppercase; letter-spacing:0.08em;
+                                            display:block; margin-bottom:6px;">
+                            Severity
+                        </MudText>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <MudIcon Icon="@Icons.Material.Filled.GpsFixed"
+                                     Style="color:#90A4AE; font-size:18px;" />
+                            <MudSelect T="string" @bind-Value="_selectedSeverity"
+                                       Variant="Variant.Text"
+                                       Style="flex:1;" Dense="true">
+                                <MudSelectItem Value='"MINOR"'>MINOR</MudSelectItem>
+                                <MudSelectItem Value='"MAJOR"'>MAJOR</MudSelectItem>
+                                <MudSelectItem Value='"MODERATE"'>MAJOR</MudSelectItem>
+                                <MudSelectItem Value='"CRITICAL"'>CRITICAL</MudSelectItem>
+                            </MudSelect>
+                            <span style="@SeverityBadgeStyle(_selectedSeverity)">
+                                @_selectedSeverity
+                            </span>
+                        </div>
+                    </div>
 
-                <!-- TAB 4: ALL STUDENTS -->
-                <MudTabPanel Text="Students" Icon="@Icons.Material.Filled.People">
-                    <AllStudentsTab />
-                </MudTabPanel>
+                    <div style="padding:14px 18px;">
+                        <MudText Typo="Typo.caption"
+                                 Style="font-size:10px; font-weight:600; color:#90A4AE;
+                                            text-transform:uppercase; letter-spacing:0.08em;
+                                            display:block; margin-bottom:6px;">
+                            Remarks (Optional)
+                        </MudText>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <MudIcon Icon="@Icons.Material.Filled.Description"
+                                     Style="color:#90A4AE; font-size:18px;" />
+                            <MudTextField @bind-Value="_remarks"
+                                          Placeholder="Add notes or remarks..."
+                                          Variant="Variant.Text"
+                                          Style="flex:1;" Dense="true" />
+                        </div>
+                    </div>
+                </div>
 
-            </MudTabs>
-        </MudContainer>
+                <MudButton Variant="Variant.Filled"
+                           OnClick="SubmitViolation"
+                           Disabled="_submitting"
+                           FullWidth="true"
+                           Style="margin-top:14px; padding:14px;
+                                      background:#E53935; color:#FFFFFF;
+                                      border-radius:12px; font-weight:700;
+                                      font-size:14px; text-transform:none;
+                                      box-shadow:0 4px 16px rgba(229,57,53,0.35);">
+                    @if (_submitting)
+                    {
+                        <MudProgressCircular Size="Size.Small" Indeterminate="true"
+                                             Style="color:#FFFFFF; margin-right:8px;" />
+                        <span>Submitting...</span>
+                    }
+                    else
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.Warning"
+                                 Style="font-size:18px; margin-right:8px;" />
+                        <span>Submit Violation</span>
+                    }
+                </MudButton>
+            }
+
+            <!-- ═══ TAB 1 — VIOLATION HISTORY ═══ -->
+            @if (_activeTab == 1)
+            {
+                <div style="display:flex; gap:10px; margin-bottom:16px;">
+                    <div style="flex:1; background:#FFFFFF;
+                                    border:1px solid #E1F5FE; border-radius:12px;
+                                    display:flex; align-items:center; gap:10px;
+                                    padding:10px 14px;">
+                        <MudIcon Icon="@Icons.Material.Filled.Search"
+                                 Style="color:#90A4AE; font-size:18px;" />
+                        <MudTextField @bind-Value="_historySearch"
+                                      Placeholder="Enter StudentNo (e.g. C26-01-0001-MAN121)"
+                                      Variant="Variant.Text" Dense="true"
+                                      Style="flex:1;" />
+                    </div>
+                    <MudButton Variant="Variant.Filled"
+                               OnClick="SearchHistory"
+                               Style="background:#1A237E; color:#FFFFFF;
+                                          border-radius:12px; font-weight:700;
+                                          text-transform:none; padding:0 18px;">
+                        Search
+                    </MudButton>
+                </div>
+
+                @if (!_historyLoaded)
+                {
+                    <div style="display:flex; flex-direction:column; align-items:center;
+                                        justify-content:center; padding:60px 20px; gap:10px;">
+                        <MudIcon Icon="@Icons.Material.Filled.LibraryBooks"
+                                 Style="color:#CFD8DC; font-size:52px;" />
+                        <MudText Typo="Typo.caption" Style="color:#90A4AE;">
+                            Search a student to view history
+                        </MudText>
+                    </div>
+                }
+            }
+
+            <!-- ═══ TAB 2 — VIOLATION SUMMARY ═══ -->
+            @if (_activeTab == 2)
+            {
+                <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:14px;">
+                    <div style="background:#FFFFFF; border:1px solid #E1F5FE;
+                                    border-radius:12px; padding:12px 16px;
+                                    display:flex; align-items:center; gap:10px;">
+                        <MudIcon Icon="@Icons.Material.Filled.CalendarMonth"
+                                 Style="color:#90A4AE; font-size:18px;" />
+                        <MudTextField @bind-Value="_startDate"
+                                      Placeholder="Start Date (yyyy-MM-dd)"
+                                      Variant="Variant.Text" Dense="true"
+                                      Style="flex:1;" />
+                    </div>
+                    <div style="background:#FFFFFF; border:1px solid #E1F5FE;
+                                    border-radius:12px; padding:12px 16px;
+                                    display:flex; align-items:center; gap:10px;">
+                        <MudIcon Icon="@Icons.Material.Filled.CalendarMonth"
+                                 Style="color:#90A4AE; font-size:18px;" />
+                        <MudTextField @bind-Value="_endDate"
+                                      Placeholder="End Date (yyyy-MM-dd)"
+                                      Variant="Variant.Text" Dense="true"
+                                      Style="flex:1;" />
+                    </div>
+                </div>
+
+                <MudButton Variant="Variant.Filled"
+                           OnClick="GetSummary"
+                           FullWidth="true"
+                           Style="background:#1A237E; color:#FFFFFF;
+                                      border-radius:12px; font-weight:700;
+                                      font-size:14px; text-transform:none;
+                                      padding:14px;
+                                      box-shadow:0 4px 14px rgba(26,35,126,0.3);">
+                    <MudIcon Icon="@Icons.Material.Filled.BarChart"
+                             Style="font-size:18px; margin-right:8px;" />
+                    Get Summary
+                </MudButton>
+
+                @if (!_summaryLoaded)
+                {
+                    <div style="display:flex; flex-direction:column; align-items:center;
+                                        justify-content:center; padding:50px 20px; gap:10px;">
+                        <MudIcon Icon="@Icons.Material.Filled.BarChart"
+                                 Style="color:#CFD8DC; font-size:52px;" />
+                        <MudText Typo="Typo.caption" Style="color:#90A4AE;">
+                            Enter a date range to view summary
+                        </MudText>
+                    </div>
+                }
+            }
+
+            <!-- ═══ TAB 3 — ALL STUDENTS ═══ -->
+            @if (_activeTab == 3)
+            {
+                <div style="background:#FFFFFF; border:1px solid #E1F5FE;
+                                border-radius:16px; overflow:hidden;
+                                box-shadow:0 2px 10px rgba(2,136,209,0.06);">
+
+                    @if (_students.Count == 0)
+                    {
+                        <div style="padding:40px; text-align:center;">
+                            <MudIcon Icon="@Icons.Material.Filled.PeopleOutline"
+                                     Style="color:#CFD8DC; font-size:48px;" />
+                            <MudText Typo="Typo.caption"
+                                     Style="display:block; color:#90A4AE; margin-top:8px;">
+                                No students found
+                            </MudText>
+                        </div>
+                    }
+                    else
+                    {
+                        @foreach (var s in _students)
+                        {
+                            <div style="display:flex; align-items:center; gap:14px;
+                                                    padding:14px 18px;
+                                                    border-bottom:1px solid #F0F7FF;
+                                                    cursor:pointer;"
+                                 @onclick="() => ViewStudent(s)">
+                                <div style="width:38px; height:38px; border-radius:50%;
+                                                        background:linear-gradient(135deg,#E1F5FE,#B3E5FC);
+                                                        border:1px solid #81D4FA;
+                                                        display:flex; align-items:center; justify-content:center;
+                                                        font-size:14px; font-weight:700; color:#0288D1;
+                                                        flex-shrink:0;">
+                                    @s.FirstName[0]
+                                </div>
+                                <div style="flex:1; min-width:0;">
+                                    <MudText Style="font-size:13px; font-weight:600;
+                                                                color:#1A237E; white-space:nowrap;
+                                                                overflow:hidden; text-overflow:ellipsis;">
+                                        @s.FirstName @s.LastName
+                                    </MudText>
+                                    <MudText Style="font-size:11px; color:#90A4AE; margin-top:1px;">
+                                        @s.StudentNo · @s.Course – @s.Year
+                                    </MudText>
+                                </div>
+                                <span style="font-size:10px; font-weight:600;
+                                                         padding:2px 10px; border-radius:20px;
+                                                         background:#E1F5FE; border:1px solid #81D4FA;
+                                                         color:#0288D1; white-space:nowrap;">
+                                    @s.Course
+                                </span>
+                            </div>
+                        }
+                    }
+                </div>
+            }
+
+        </div>  @* ← closes: position:relative z-index:1 div *@
+
     </MudMainContent>
 
-    <!-- BOTTOM FAB - QR SCANNER -->
-    <div style="position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:200;">
-        <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.QrCodeScanner"
-                Style="background: linear-gradient(135deg, #29B6F6, #0288D1); box-shadow: 0 8px 24px rgba(2, 136, 209, 0.35);"
-                OnClick="OpenQrModal" />
+    <!-- BOTTOM NAV BAR -->
+    <div style="position:fixed; bottom:0; left:0; right:0; z-index:300;
+                background:rgba(255,255,255,0.97); backdrop-filter:blur(24px);
+                border-top:1px solid #E1F5FE;
+                box-shadow:0 -4px 20px rgba(26,35,126,0.08);
+                height:68px; display:flex; align-items:center; padding:0 8px;">
+
+        <button @onclick="() => SetTab(0)" style="@NavBtnStyle(0)">
+            <MudIcon Icon="@Icons.Material.Filled.AddCircle" Style="@NavIconStyle(0)" />
+            <span style="@NavLabelStyle(0)">Record</span>
+        </button>
+
+        <button @onclick="() => SetTab(1)" style="@NavBtnStyle(1)">
+            <MudIcon Icon="@Icons.Material.Filled.History" Style="@NavIconStyle(1)" />
+            <span style="@NavLabelStyle(1)">History</span>
+        </button>
+
+        <div style="flex:0 0 72px; display:flex; justify-content:center; align-items:center;">
+            <button @onclick="OpenQrModal"
+                    style="width:54px; height:54px; border-radius:50%;
+                           background:#1A237E; border:3px solid #FFFFFF;
+                           box-shadow:0 6px 20px rgba(26,35,126,0.45);
+                           display:flex; align-items:center; justify-content:center;
+                           cursor:pointer; position:relative; top:-12px;">
+                <MudIcon Icon="@Icons.Material.Filled.QrCodeScanner"
+                         Style="color:#FFFFFF; font-size:24px;" />
+            </button>
+        </div>
+
+        <button @onclick="() => SetTab(2)" style="@NavBtnStyle(2)">
+            <MudIcon Icon="@Icons.Material.Filled.BarChart" Style="@NavIconStyle(2)" />
+            <span style="@NavLabelStyle(2)">Summary</span>
+        </button>
+
+        <button @onclick="() => SetTab(3)" style="@NavBtnStyle(3)">
+            <MudIcon Icon="@Icons.Material.Filled.PeopleAlt" Style="@NavIconStyle(3)" />
+            <span style="@NavLabelStyle(3)">Students</span>
+        </button>
+
     </div>
 
     <!-- QR SCANNER DIALOG -->
     <MudDialog @bind-IsVisible="_qrModalOpen" Options="_qrDialogOptions">
         <TitleContent>
             <div style="display:flex; align-items:center; gap:8px;">
-                <MudIcon Icon="@Icons.Material.Filled.QrCodeScanner" Style="color: #0288D1;" />
-                <MudText Typo="Typo.h6" Style="color: #37474F; font-weight: 600;">
+                <MudIcon Icon="@Icons.Material.Filled.QrCodeScanner"
+                         Style="color:#0288D1; font-size:22px;" />
+                <MudText Typo="Typo.h6"
+                         Style="color:#1A237E; font-weight:700; font-size:16px;">
                     Validate Student
                 </MudText>
             </div>
         </TitleContent>
         <DialogContent>
-            <!-- Camera Placeholder -->
-            <div style="background: #F0F8FF; border: 2px dashed #B3E5FC; border-radius:14px; padding:20px; display:flex; align-items:center; justify-content:center; min-height:130px; margin-bottom:16px;">
-                <div style="text-align:center; color: #546E7A;">
-                    <MudIcon Icon="@Icons.Material.Filled.QrCode" Style="font-size:44px; color: #B3E5FC;" />
-                    <MudText Typo="Typo.caption" Style="display:block; margin-top:6px;">Camera on mobile only</MudText>
+
+            <div style="background:#0D1233; border-radius:12px; padding:20px 16px;
+                        display:flex; align-items:center; justify-content:center;
+                        min-height:140px; margin-bottom:14px;
+                        position:relative; overflow:hidden;">
+                <div style="position:absolute; top:11px; left:11px; width:20px; height:20px;
+                            border-top:2px solid rgba(255,255,255,0.7);
+                            border-left:2px solid rgba(255,255,255,0.7);"></div>
+                <div style="position:absolute; top:11px; right:11px; width:20px; height:20px;
+                            border-top:2px solid rgba(255,255,255,0.7);
+                            border-right:2px solid rgba(255,255,255,0.7);"></div>
+                <div style="position:absolute; bottom:11px; left:11px; width:20px; height:20px;
+                            border-bottom:2px solid rgba(255,255,255,0.7);
+                            border-left:2px solid rgba(255,255,255,0.7);"></div>
+                <div style="position:absolute; bottom:11px; right:11px; width:20px; height:20px;
+                            border-bottom:2px solid rgba(255,255,255,0.7);
+                            border-right:2px solid rgba(255,255,255,0.7);"></div>
+                <div style="text-align:center;">
+                    <MudIcon Icon="@Icons.Material.Filled.QrCodeScanner"
+                             Style="font-size:42px; color:rgba(255,255,255,0.30);" />
+                    <MudText Typo="Typo.caption"
+                             Style="display:block; margin-top:6px;
+                                    color:rgba(255,255,255,0.45); font-size:11px;">
+                        Camera on mobile only
+                    </MudText>
                 </div>
             </div>
-            
-            <MudText Typo="Typo.caption" Align="Align.Center" Style="color: #90A4AE; display:block; margin:10px 0; font-weight: 600;">OR enter manually</MudText>
-            
-            <!-- Input Field -->
-            <div style="background: #FFFFFF; border: 1px solid #E1F5FE; border-radius: 10px; padding: 4px;">
-                 <MudTextField @bind-Value="_manualStudentNo"
-                          Placeholder="e.g. C26-01-0001-MAN121"
-                          Variant="Variant.Text"
-                          Adornment="Adornment.Start"
-                          AdornmentIcon="@Icons.Material.Filled.School"
-                          AdornmentColor="Color.Primary"
-                          Style="width: 100%;" />
+
+            <div style="display:flex; align-items:center; gap:8px; margin:12px 0;">
+                <div style="flex:1; height:1px; background:#E1F5FE;"></div>
+                <MudText Typo="Typo.caption"
+                         Style="color:#90A4AE; font-size:11px; font-weight:600;
+                                letter-spacing:0.06em;">
+                    OR enter manually
+                </MudText>
+                <div style="flex:1; height:1px; background:#E1F5FE;"></div>
+            </div>
+
+            <div style="background:#FFFFFF; border:1.5px solid #E1F5FE;
+                        border-radius:10px; overflow:hidden;">
+                <MudTextField @bind-Value="_manualStudentNo"
+                              Placeholder="e.g. C26-01-0001-MAN121"
+                              Variant="Variant.Text"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.School"
+                              AdornmentColor="Color.Primary"
+                              Style="width:100%;" />
             </div>
 
             @if (_validateError != null)
             {
-                <MudAlert Severity="Severity.Error" Style="margin-top:12px; background: #FFEBEE; color: #C62828; border:1px solid #FFCDD2; border-radius: 8px;">
+                <MudAlert Severity="Severity.Error" Dense="true"
+                          Style="margin-top:10px; border-radius:8px;
+                                     background:#FFEBEE; color:#C62828;
+                                     border:1px solid #FFCDD2;">
                     @_validateError
                 </MudAlert>
             }
+
             @if (_validatedStudent is not null)
             {
-                var student = _validatedStudent;
-                <MudPaper Elevation="0" Style="background:#E8F5E9; border:1px solid #C8E6C9; border-radius:12px; padding:12px; margin-top:16px;">
-                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
-                        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Style="color:#2E7D32;" />
-                        <div>
-                            <MudText Typo="Typo.subtitle2" Style="color:#2E7D32; font-weight:600;">✓ Student Found</MudText>
-                            <MudText Typo="Typo.body2" Style="color:#1B5E20;">@student.FirstName @student.LastName</MudText>
-                            <MudText Typo="Typo.caption" Style="color:#4CAF50;">@student.StudentNo · @student.Course @student.Year</MudText>
-                        </div>
-                    </MudStack>
-                </MudPaper>
+                var st = _validatedStudent;
+                <div style="background:#E8F5E9; border:1px solid #C8E6C9;
+                                border-radius:10px; padding:12px 14px; margin-top:12px;
+                                display:flex; align-items:center; gap:10px;">
+                    <MudIcon Icon="@Icons.Material.Filled.CheckCircle"
+                             Style="color:#2E7D32; font-size:26px;" />
+                    <div>
+                        <MudText Style="color:#2E7D32; font-weight:700; font-size:12px;">
+                            Student Found
+                        </MudText>
+                        <MudText Style="color:#1B5E20; font-size:14px; font-weight:600;">
+                            @st.FirstName @st.LastName
+                        </MudText>
+                        <MudText Style="color:#388E3C; font-size:11px;">
+                            @st.StudentNo &middot; @st.Course @st.Year
+                        </MudText>
+                    </div>
+                </div>
             }
+
         </DialogContent>
         <DialogActions>
             <MudButton OnClick="CloseQrModal"
-                       Style="background: #F5F5F5; color: #455A64; border-radius:10px; border: 1px solid #E0E0E0;">
+                       Style="color:#546E7A; font-weight:600; text-transform:none;">
                 Close
             </MudButton>
-            <MudButton Variant="Variant.Filled" OnClick="ValidateStudent"
+            <MudButton Variant="Variant.Filled"
+                       OnClick="ValidateStudent"
                        Disabled="_validating"
-                       Style="background: linear-gradient(135deg, #29B6F6, #0288D1); color: white; border-radius:10px; box-shadow: 0 4px 12px rgba(2, 136, 209, 0.25);">
+                       Style="background:#1A237E; color:#FFFFFF;
+                              border-radius:8px; font-weight:700;
+                              text-transform:none;
+                              box-shadow:0 2px 8px rgba(26,35,126,0.3);">
                 @if (_validating)
                 {
-                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Style="color: white;" />
+                    <MudProgressCircular Size="Size.Small" Indeterminate="true"
+                                         Style="color:#FFFFFF;" />
                 }
                 else
                 {
-                    <span>✓ Validate</span>
+                    <span>Validate</span>
                 }
             </MudButton>
         </DialogActions>
     </MudDialog>
+
 </MudLayout>
 
+
 @code {
+
     private int _activeTab = 0;
+
+    private string _currentTime = "";
+    private System.Threading.Timer? _clockTimer;
+
+    private bool _notifOpen = false;
+    private int _notifCount => _notifications.Count;
+    private List<NotifItem> _notifications = new();
+    private record NotifItem(string Title, string Message);
+
+    private string _selectedStudent = "";
+    private string _selectedViolationType = "";
+    private string _selectedSeverity = "MINOR";
+    private string _remarks = "";
+    private bool _submitting = false;
+
+    private string _historySearch = "";
+    private bool _historyLoaded = false;
+
+    private string _startDate = "";
+    private string _endDate = "";
+    private bool _summaryLoaded = false;
+
+    private List<StudentModel> _students = new();
+    private int _studentCount => _students.Count;
+
     private bool _qrModalOpen = false;
     private string _manualStudentNo = "";
     private bool _validating = false;
@@ -163,9 +617,102 @@
         MaxWidth = MaxWidth.ExtraSmall,
         FullWidth = true,
         BackdropClick = true,
-        CloseButton = false,
-        BackgroundClass = "qr-backdrop"
+        CloseButton = false
     };
+
+    protected override async Task OnInitializedAsync()
+    {
+        UpdateClock();
+        _clockTimer = new System.Threading.Timer(_ =>
+        {
+            UpdateClock();
+            InvokeAsync(StateHasChanged);
+        }, null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
+
+        await Task.CompletedTask;
+    }
+
+    private void UpdateClock() =>
+        _currentTime = DateTime.Now.ToString("MMM d · h:mm tt");
+
+    public void Dispose() => _clockTimer?.Dispose();
+
+    private void ToggleNotifications() => _notifOpen = !_notifOpen;
+    private void CloseNotifications() => _notifOpen = false;
+
+    private string _panelTitle => _activeTab switch
+    {
+        0 => "Record Violation",
+        1 => "Violation History",
+        2 => "Violation Summary",
+        3 => "All Students",
+        _ => ""
+    };
+
+    private string _panelIcon => _activeTab switch
+    {
+        0 => Icons.Material.Filled.AddCircle,
+        1 => Icons.Material.Filled.History,
+        2 => Icons.Material.Filled.BarChart,
+        3 => Icons.Material.Filled.PeopleAlt,
+        _ => Icons.Material.Filled.Dashboard
+    };
+
+    private string _accentColor => _activeTab switch
+    {
+        0 => "#0288D1",
+        1 => "#F9A825",
+        2 => "#0288D1",
+        3 => "#0288D1",
+        _ => "#0288D1"
+    };
+
+    private string SeverityBadgeStyle(string severity) => severity switch
+    {
+        "MAJOR" => "padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; " +
+                      "background:rgba(249,168,37,0.12); border:1px solid rgba(249,168,37,0.4); color:#F9A825;",
+        "CRITICAL" => "padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; " +
+                      "background:rgba(229,57,53,0.10); border:1px solid rgba(229,57,53,0.4); color:#E53935;",
+        _ => "padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; " +
+                      "background:rgba(2,136,209,0.10); border:1px solid rgba(2,136,209,0.35); color:#0288D1;"
+    };
+
+    private void SetTab(int idx) => _activeTab = idx;
+
+    private string NavBtnStyle(int idx) =>
+        "flex:1; display:flex; flex-direction:column; align-items:center; " +
+        "justify-content:center; gap:3px; border:none; " +
+        $"background:{(_activeTab == idx ? "#E8EAF6" : "transparent")}; " +
+        "cursor:pointer; padding:6px 4px; border-radius:12px; height:56px;";
+
+    private string NavIconStyle(int idx) =>
+        $"font-size:20px; color:{(_activeTab == idx ? "#1A237E" : "#90A4AE")};";
+
+    private string NavLabelStyle(int idx) =>
+        $"font-size:10px; font-weight:{(_activeTab == idx ? "700" : "400")}; " +
+        $"color:{(_activeTab == idx ? "#1A237E" : "#90A4AE")}; font-family:inherit;";
+
+    private async Task SubmitViolation()
+    {
+        _submitting = true;
+        await Task.Delay(500);
+        _submitting = false;
+        Snackbar.Add("Violation submitted!", Severity.Success);
+    }
+
+    private async Task SearchHistory()
+    {
+        _historyLoaded = true;
+        await Task.CompletedTask;
+    }
+
+    private async Task GetSummary()
+    {
+        _summaryLoaded = true;
+        await Task.CompletedTask;
+    }
+
+    private void ViewStudent(StudentModel s) { }
 
     private void OpenQrModal()
     {
@@ -180,21 +727,20 @@
     private async Task ValidateStudent()
     {
         if (string.IsNullOrWhiteSpace(_manualStudentNo)) return;
+
         _validating = true;
         _validateError = null;
         _validatedStudent = null;
 
-        var result = await GuardService.ValidateStudentAsync(_manualStudentNo.Trim().ToUpper());
+        var result = await GuardService.ValidateStudentAsync(
+            _manualStudentNo.Trim().ToUpper());
+
         _validating = false;
 
         if (result.Status == 200 && result.Data != null)
-        {
             _validatedStudent = result.Data;
-        }
         else
-        {
             _validateError = result.Message ?? "Student not found.";
-        }
     }
 
     private async Task Logout()

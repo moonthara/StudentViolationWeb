@@ -5,74 +5,70 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
 
-public class AuthService
-{
-    private readonly HttpClient _http;
-    private readonly ILocalStorageService _localStorage;
 
-
-
-    public AuthService(HttpClient http, ILocalStorageService localStorage)
+    public class AuthService
     {
-        _http = http;
-        _localStorage = localStorage;
-    }
+        private readonly HttpClient _http;
+        private readonly ILocalStorageService _localStorage;
 
-    public async Task<ServiceResponse<LoginDto>> LoginAsync(LoginModel login)
-    {
-        try
+        public AuthService(HttpClient http, ILocalStorageService localStorage)
         {
-            var response = await _http.PostAsJsonAsync("api/auth/login", login);
-            var result = await response.Content.ReadFromJsonAsync<ServiceResponse<LoginDto>>();
-           
+            _http = http;
+            _localStorage = localStorage;
+        }
 
-            if (result?.Token != null)
+        public async Task<ServiceResponse<LoginDto>> LoginAsync(LoginModel login)
+        {
+            try
             {
-                await _localStorage.SetItemAsync("authToken", result.Token);
-                _http.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", result.Token);
+                var response = await _http.PostAsJsonAsync("api/auth/login", login);
+                var result = await response.Content.ReadFromJsonAsync<ServiceResponse<LoginDto>>();
+
+                if (result?.Token != null)
+                {
+                    await _localStorage.SetItemAsync("authToken", result.Token);
+                    _http.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", result.Token);
+                }
+                return result ?? new ServiceResponse<LoginDto> { Status = 500, Message = "Empty response" };
             }
-
-            return result ?? new ServiceResponse<LoginDto> { Status = 500, Message = "Empty response" };
-        }
-        catch (Exception ex)
-        {
-            return new ServiceResponse<LoginDto> { Status = 500, Message = ex.Message };
-        }
-    }
-
-    public async Task<ServiceResponse<LoginDto>> RegisterAsync(RegisterModel register)
-    {
-        try
-        {
-            var response = await _http.PostAsJsonAsync("api/auth/register", register);
-            var result = await response.Content.ReadFromJsonAsync<ServiceResponse<LoginDto>>();
-
-
-            if (result?.Token != null)
+            catch (Exception ex)
             {
-                await _localStorage.SetItemAsync("authToken", result.Token);
-                _http.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", result.Token);
+                return new ServiceResponse<LoginDto> { Status = 500, Message = ex.Message };
             }
-
-            return result ?? new ServiceResponse<LoginDto> { Status = 500, Message = "Empty response" };
         }
-        catch (Exception ex)
+
+        public async Task<ServiceResponse<LoginDto>> RegisterAsync(RegisterModel register)
         {
-            return new ServiceResponse<LoginDto> { Status = 500, Message = ex.Message };
+            try
+            {
+                var response = await _http.PostAsJsonAsync("api/auth/register", register);
+                var result = await response.Content.ReadFromJsonAsync<ServiceResponse<LoginDto>>();
+
+                if (result?.Token != null)
+                {
+                    await _localStorage.SetItemAsync("authToken", result.Token);
+                    _http.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", result.Token);
+                }
+                return result ?? new ServiceResponse<LoginDto> { Status = 500, Message = "Empty response" };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse<LoginDto> { Status = 500, Message = ex.Message };
+            }
+        }
+
+        public async Task Logout()
+        {
+            await _localStorage.RemoveItemAsync("authToken");
+            _http.DefaultRequestHeaders.Authorization = null;
         }
     }
 
-    public async Task Logout()
+    public class LoginDto
     {
-        await _localStorage.RemoveItemAsync("authToken");
-        _http.DefaultRequestHeaders.Authorization = null;
+        public string? Role { get; set; }
+        public string? Token { get; set; }
     }
-}
 
-public class LoginDto
-{
-    public string Role { get; set; } = "";
-    public string? Token { get; set; }
-}
