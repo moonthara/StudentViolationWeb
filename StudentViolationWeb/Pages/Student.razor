@@ -9,7 +9,7 @@
 
 <MudLayout>
 
-    <!-- APP BAR -->
+    @* bar *@
     <MudAppBar Elevation="0"
                Style="background:rgba(255,255,255,0.95);
                       backdrop-filter:blur(20px);
@@ -32,16 +32,16 @@
                        Style="color:#546E7A;" />
     </MudAppBar>
 
-    <!-- MAIN CONTENT -->
+    @* main *@
     <MudMainContent Style="background:#F4F9FD; min-height:100vh; padding-bottom:80px;">
 
-        <!-- background blobs -->
+        
         <div style="position:fixed; inset:0;
                     background:
                         radial-gradient(ellipse 60% 50% at 0% 0%,  #E1F5FE 0%, transparent 60%),
                         radial-gradient(ellipse 40% 40% at 100% 100%, #B3E5FC 0%, transparent 60%);
                     pointer-events:none; z-index:0;"></div>
-        <!-- dot grid -->
+        
         <div style="position:fixed; inset:0;
                     background-image:radial-gradient(#B3E5FC 1px, transparent 1px);
                     background-size:24px 24px;
@@ -49,10 +49,10 @@
 
         <div style="position:relative; z-index:1; padding:16px 16px 0;">
 
-            <!-- ═══ TAB 0 — DASHBOARD ═══ -->
+            
             @if (_activeTab == 0)
             {
-                <!-- WELCOME BANNER -->
+                @* welcome *@
                 <div style="background:linear-gradient(135deg,#FFFFFF,#E1F5FE);
                             border:1px solid #B3E5FC; border-radius:16px;
                             padding:16px 20px; margin-bottom:18px;
@@ -78,7 +78,7 @@
                     </div>
                 </div>
 
-                <!-- PANEL HEADER -->
+                
                 <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
                     <div style="width:4px; height:20px; background:#0288D1; border-radius:4px;"></div>
                     <MudIcon Icon="@Icons.Material.Filled.Dashboard"
@@ -89,7 +89,7 @@
                     </MudText>
                 </div>
 
-                <!-- STATS ROW -->
+               
                 <div style="display:flex; gap:8px; margin-bottom:14px;">
 
                     @foreach (var stat in new[] {
@@ -114,7 +114,7 @@
                     }
                 </div>
 
-                <!-- WARNING LEVEL CARD -->
+                @* warning_level *@
                 <div style="background:#FFFFFF; border:1px solid @GetWarningLevelBorderColor();
                             border-radius:12px; padding:12px 16px; margin-bottom:14px;
                             display:flex; align-items:center; gap:10px;
@@ -131,7 +131,7 @@
                     </div>
                 </div>
 
-                <!-- VIOLATION HISTORY HEADER -->
+                @* violation_history *@
                 <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
                     <div style="width:4px; height:20px; background:#F9A825; border-radius:4px;"></div>
                     <MudIcon Icon="@Icons.Material.Filled.History"
@@ -142,7 +142,7 @@
                     </MudText>
                 </div>
 
-                <!-- VIOLATIONS LIST -->
+                @* violation_list *@
                 <div style="background:#FFFFFF; border:1px solid #E1F5FE;
                             border-radius:16px; overflow:hidden;
                             box-shadow:0 2px 10px rgba(2,136,209,0.06);">
@@ -193,10 +193,10 @@
                 </div>
             }
 
-            <!-- ═══ TAB 1 — PROFILE ═══ -->
+            @* profile *@
             @if (_activeTab == 1)
             {
-                <!-- PANEL HEADER -->
+                
                 <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
                     <div style="width:4px; height:20px; background:#0288D1; border-radius:4px;"></div>
                     <MudIcon Icon="@Icons.Material.Filled.Person"
@@ -207,7 +207,7 @@
                     </MudText>
                 </div>
 
-                <!-- AVATAR CARD -->
+                
                 <div style="background:linear-gradient(135deg,#FFFFFF,#E1F5FE);
                             border:1px solid #B3E5FC; border-radius:16px;
                             padding:20px; margin-bottom:14px;
@@ -229,7 +229,7 @@
                     </MudText>
                 </div>
 
-                <!-- PROFILE DETAILS CARD -->
+                @* profile_card *@
                 <div style="background:#FFFFFF; border:1px solid #E1F5FE;
                             border-radius:16px; overflow:hidden;
                             box-shadow:0 2px 10px rgba(2,136,209,0.06);">
@@ -261,10 +261,10 @@
                 </div>
             }
 
-            <!-- ═══ TAB 2 — QR CODE ═══ -->
+            @* qr_code *@
             @if (_activeTab == 2)
             {
-                <!-- PANEL HEADER -->
+               
                 <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
                     <div style="width:4px; height:20px; background:#0288D1; border-radius:4px;"></div>
                     <MudIcon Icon="@Icons.Material.Filled.QrCode2"
@@ -285,7 +285,7 @@
                         Show this to the Guard for scanning
                     </MudText>
 
-                    <!-- QR frame mimicking guard's scanner box -->
+                    
                     <div style="width:200px; height:200px;
                                 background:#0D1233; border-radius:12px;
                                 margin:0 auto 16px;
@@ -337,7 +337,7 @@
 
     </MudMainContent>
 
-    <!-- BOTTOM NAV BAR -->
+    @* botton_nav *@
     <div style="position:fixed; bottom:0; left:0; right:0; z-index:300;
                 background:rgba(255,255,255,0.97); backdrop-filter:blur(24px);
                 border-top:1px solid #E1F5FE;

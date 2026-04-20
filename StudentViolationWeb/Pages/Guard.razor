@@ -9,7 +9,7 @@
 
 <MudLayout>
 
-    <!-- APP BAR -->
+    @* bar *@
     <MudAppBar Elevation="0"
                Style="background:rgba(255,255,255,0.95);
                       backdrop-filter:blur(20px);
@@ -32,52 +32,10 @@
             @_currentTime
         </MudText>
 
-        <MudBadge Content="@_notifCount" Color="Color.Error"
-                  Overlap="true" Visible="@(_notifCount > 0)">
-            <MudIconButton Icon="@Icons.Material.Filled.Notifications"
-                           OnClick="ToggleNotifications"
-                           Style="color:#546E7A;" />
-        </MudBadge>
-
         <MudIconButton Icon="@Icons.Material.Filled.Logout"
                        OnClick="Logout"
                        Style="color:#546E7A;" />
     </MudAppBar>
-
-   
-
-        @if (_notifications.Count == 0)
-        {
-            <div style="padding:24px; text-align:center; background:#FFFFFF;">
-                <MudIcon Icon="@Icons.Material.Filled.NotificationsNone"
-                         Style="color:#B0BEC5; font-size:36px;" />
-                <MudText Typo="Typo.caption"
-                         Style="display:block; color:#90A4AE; margin-top:6px;">
-                    No new notifications
-                </MudText>
-            </div>
-        }
-        else
-        {
-            @foreach (var n in _notifications)
-            {
-                <div style="padding:12px 16px; border-bottom:1px solid #F1F8FE;
-                                    background:#FFFFFF;
-                                    display:flex; gap:10px; align-items:flex-start;">
-                    <MudIcon Icon="@Icons.Material.Filled.Warning"
-                             Style="color:#F9A825; font-size:18px; flex-shrink:0; margin-top:2px;" />
-                    <div>
-                        <MudText Typo="Typo.body2"
-                                 Style="color:#1A237E; font-weight:600; font-size:12px;">
-                            @n.Title
-                        </MudText>
-                        <MudText Typo="Typo.caption" Style="color:#546E7A;">
-                            @n.Message
-                        </MudText>
-                    </div>
-                </div>
-            }
-        }
 
     <!-- MAIN CONTENT -->
     <MudMainContent Style="background:#F4F9FD; min-height:100vh; padding-bottom:80px;">
@@ -98,15 +56,15 @@
             @if (_activeTab == 0)
             {
                 <div style="background:linear-gradient(135deg,#FFFFFF,#E1F5FE);
-                                border:1px solid #B3E5FC; border-radius:16px;
-                                padding:16px 20px; margin-bottom:18px;
-                                display:flex; align-items:center; gap:16px;
-                                box-shadow:0 4px 12px rgba(2,136,209,0.08);">
+                                    border:1px solid #B3E5FC; border-radius:16px;
+                                    padding:16px 20px; margin-bottom:18px;
+                                    display:flex; align-items:center; gap:16px;
+                                    box-shadow:0 4px 12px rgba(2,136,209,0.08);">
                     <div style="width:44px; height:44px; border-radius:12px;
-                                    background:#0288D1;
-                                    display:flex; align-items:center; justify-content:center;
-                                    flex-shrink:0;
-                                    box-shadow:0 4px 8px rgba(2,136,209,0.25);">
+                                        background:#0288D1;
+                                        display:flex; align-items:center; justify-content:center;
+                                        flex-shrink:0;
+                                        box-shadow:0 4px 8px rgba(2,136,209,0.25);">
                         <MudIcon Icon="@Icons.Material.Filled.Shield"
                                  Style="color:#FFFFFF; font-size:22px;" />
                     </div>
@@ -147,14 +105,14 @@
             @if (_activeTab == 0)
             {
                 <div style="background:#FFFFFF; border:1px solid #E1F5FE;
-                                border-radius:16px;
-                                box-shadow:0 2px 10px rgba(2,136,209,0.06); overflow:hidden;">
+                                    border-radius:16px;
+                                    box-shadow:0 2px 10px rgba(2,136,209,0.06); overflow:hidden;">
 
                     <div style="padding:14px 18px; border-bottom:1px solid #F0F7FF;">
                         <MudText Typo="Typo.caption"
                                  Style="font-size:10px; font-weight:600; color:#90A4AE;
-                                            text-transform:uppercase; letter-spacing:0.08em;
-                                            display:block; margin-bottom:6px;">
+                                                text-transform:uppercase; letter-spacing:0.08em;
+                                                display:block; margin-bottom:6px;">
                             Select Student
                         </MudText>
                         <div style="display:flex; align-items:center; gap:10px;">
@@ -171,8 +129,8 @@
                     <div style="padding:14px 18px; border-bottom:1px solid #F0F7FF;">
                         <MudText Typo="Typo.caption"
                                  Style="font-size:10px; font-weight:600; color:#90A4AE;
-                                            text-transform:uppercase; letter-spacing:0.08em;
-                                            display:block; margin-bottom:6px;">
+                                                text-transform:uppercase; letter-spacing:0.08em;
+                                                display:block; margin-bottom:6px;">
                             Violation Type
                         </MudText>
                         <div style="display:flex; align-items:center; gap:10px;">
@@ -193,15 +151,14 @@
                                 <MudSelectItem Value='"Prohibited Items"'>Prohibited Items</MudSelectItem>
                                 <MudSelectItem Value='"Other"'>Other</MudSelectItem>
                             </MudSelect>
-                       
                         </div>
                     </div>
 
                     <div style="padding:14px 18px; border-bottom:1px solid #F0F7FF;">
                         <MudText Typo="Typo.caption"
                                  Style="font-size:10px; font-weight:600; color:#90A4AE;
-                                            text-transform:uppercase; letter-spacing:0.08em;
-                                            display:block; margin-bottom:6px;">
+                                                text-transform:uppercase; letter-spacing:0.08em;
+                                                display:block; margin-bottom:6px;">
                             Severity
                         </MudText>
                         <div style="display:flex; align-items:center; gap:10px;">
@@ -212,7 +169,7 @@
                                        Style="flex:1;" Dense="true">
                                 <MudSelectItem Value='"MINOR"'>MINOR</MudSelectItem>
                                 <MudSelectItem Value='"MAJOR"'>MAJOR</MudSelectItem>
-                                <MudSelectItem Value='"MODERATE"'>MAJOR</MudSelectItem>
+                                <MudSelectItem Value='"MODERATE"'>MODERATE</MudSelectItem>
                                 <MudSelectItem Value='"CRITICAL"'>CRITICAL</MudSelectItem>
                             </MudSelect>
                             <span style="@SeverityBadgeStyle(_selectedSeverity)">
@@ -224,8 +181,8 @@
                     <div style="padding:14px 18px;">
                         <MudText Typo="Typo.caption"
                                  Style="font-size:10px; font-weight:600; color:#90A4AE;
-                                            text-transform:uppercase; letter-spacing:0.08em;
-                                            display:block; margin-bottom:6px;">
+                                                text-transform:uppercase; letter-spacing:0.08em;
+                                                display:block; margin-bottom:6px;">
                             Remarks (Optional)
                         </MudText>
                         <div style="display:flex; align-items:center; gap:10px;">
@@ -244,10 +201,10 @@
                            Disabled="_submitting"
                            FullWidth="true"
                            Style="margin-top:14px; padding:14px;
-                                      background:#E53935; color:#FFFFFF;
-                                      border-radius:12px; font-weight:700;
-                                      font-size:14px; text-transform:none;
-                                      box-shadow:0 4px 16px rgba(229,57,53,0.35);">
+                                          background:#E53935; color:#FFFFFF;
+                                          border-radius:12px; font-weight:700;
+                                          font-size:14px; text-transform:none;
+                                          box-shadow:0 4px 16px rgba(229,57,53,0.35);">
                     @if (_submitting)
                     {
                         <MudProgressCircular Size="Size.Small" Indeterminate="true"
@@ -268,9 +225,9 @@
             {
                 <div style="display:flex; gap:10px; margin-bottom:16px;">
                     <div style="flex:1; background:#FFFFFF;
-                                    border:1px solid #E1F5FE; border-radius:12px;
-                                    display:flex; align-items:center; gap:10px;
-                                    padding:10px 14px;">
+                                        border:1px solid #E1F5FE; border-radius:12px;
+                                        display:flex; align-items:center; gap:10px;
+                                        padding:10px 14px;">
                         <MudIcon Icon="@Icons.Material.Filled.Search"
                                  Style="color:#90A4AE; font-size:18px;" />
                         <MudTextField @bind-Value="_historySearch"
@@ -281,8 +238,8 @@
                     <MudButton Variant="Variant.Filled"
                                OnClick="SearchHistory"
                                Style="background:#1A237E; color:#FFFFFF;
-                                          border-radius:12px; font-weight:700;
-                                          text-transform:none; padding:0 18px;">
+                                              border-radius:12px; font-weight:700;
+                                              text-transform:none; padding:0 18px;">
                         Search
                     </MudButton>
                 </div>
@@ -290,7 +247,7 @@
                 @if (!_historyLoaded)
                 {
                     <div style="display:flex; flex-direction:column; align-items:center;
-                                        justify-content:center; padding:60px 20px; gap:10px;">
+                                                justify-content:center; padding:60px 20px; gap:10px;">
                         <MudIcon Icon="@Icons.Material.Filled.LibraryBooks"
                                  Style="color:#CFD8DC; font-size:52px;" />
                         <MudText Typo="Typo.caption" Style="color:#90A4AE;">
@@ -305,8 +262,8 @@
             {
                 <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:14px;">
                     <div style="background:#FFFFFF; border:1px solid #E1F5FE;
-                                    border-radius:12px; padding:12px 16px;
-                                    display:flex; align-items:center; gap:10px;">
+                                        border-radius:12px; padding:12px 16px;
+                                        display:flex; align-items:center; gap:10px;">
                         <MudIcon Icon="@Icons.Material.Filled.CalendarMonth"
                                  Style="color:#90A4AE; font-size:18px;" />
                         <MudTextField @bind-Value="_startDate"
@@ -315,8 +272,8 @@
                                       Style="flex:1;" />
                     </div>
                     <div style="background:#FFFFFF; border:1px solid #E1F5FE;
-                                    border-radius:12px; padding:12px 16px;
-                                    display:flex; align-items:center; gap:10px;">
+                                        border-radius:12px; padding:12px 16px;
+                                        display:flex; align-items:center; gap:10px;">
                         <MudIcon Icon="@Icons.Material.Filled.CalendarMonth"
                                  Style="color:#90A4AE; font-size:18px;" />
                         <MudTextField @bind-Value="_endDate"
@@ -330,10 +287,10 @@
                            OnClick="GetSummary"
                            FullWidth="true"
                            Style="background:#1A237E; color:#FFFFFF;
-                                      border-radius:12px; font-weight:700;
-                                      font-size:14px; text-transform:none;
-                                      padding:14px;
-                                      box-shadow:0 4px 14px rgba(26,35,126,0.3);">
+                                          border-radius:12px; font-weight:700;
+                                          font-size:14px; text-transform:none;
+                                          padding:14px;
+                                          box-shadow:0 4px 14px rgba(26,35,126,0.3);">
                     <MudIcon Icon="@Icons.Material.Filled.BarChart"
                              Style="font-size:18px; margin-right:8px;" />
                     Get Summary
@@ -342,7 +299,7 @@
                 @if (!_summaryLoaded)
                 {
                     <div style="display:flex; flex-direction:column; align-items:center;
-                                        justify-content:center; padding:50px 20px; gap:10px;">
+                                                justify-content:center; padding:50px 20px; gap:10px;">
                         <MudIcon Icon="@Icons.Material.Filled.BarChart"
                                  Style="color:#CFD8DC; font-size:52px;" />
                         <MudText Typo="Typo.caption" Style="color:#90A4AE;">
@@ -356,8 +313,8 @@
             @if (_activeTab == 3)
             {
                 <div style="background:#FFFFFF; border:1px solid #E1F5FE;
-                                border-radius:16px; overflow:hidden;
-                                box-shadow:0 2px 10px rgba(2,136,209,0.06);">
+                                    border-radius:16px; overflow:hidden;
+                                    box-shadow:0 2px 10px rgba(2,136,209,0.06);">
 
                     @if (_students.Count == 0)
                     {
@@ -375,22 +332,22 @@
                         @foreach (var s in _students)
                         {
                             <div style="display:flex; align-items:center; gap:14px;
-                                                    padding:14px 18px;
-                                                    border-bottom:1px solid #F0F7FF;
-                                                    cursor:pointer;"
+                                                                padding:14px 18px;
+                                                                border-bottom:1px solid #F0F7FF;
+                                                                cursor:pointer;"
                                  @onclick="() => ViewStudent(s)">
                                 <div style="width:38px; height:38px; border-radius:50%;
-                                                        background:linear-gradient(135deg,#E1F5FE,#B3E5FC);
-                                                        border:1px solid #81D4FA;
-                                                        display:flex; align-items:center; justify-content:center;
-                                                        font-size:14px; font-weight:700; color:#0288D1;
-                                                        flex-shrink:0;">
+                                                                    background:linear-gradient(135deg,#E1F5FE,#B3E5FC);
+                                                                    border:1px solid #81D4FA;
+                                                                    display:flex; align-items:center; justify-content:center;
+                                                                    font-size:14px; font-weight:700; color:#0288D1;
+                                                                    flex-shrink:0;">
                                     @s.FirstName[0]
                                 </div>
                                 <div style="flex:1; min-width:0;">
                                     <MudText Style="font-size:13px; font-weight:600;
-                                                                color:#1A237E; white-space:nowrap;
-                                                                overflow:hidden; text-overflow:ellipsis;">
+                                                                            color:#1A237E; white-space:nowrap;
+                                                                            overflow:hidden; text-overflow:ellipsis;">
                                         @s.FirstName @s.LastName
                                     </MudText>
                                     <MudText Style="font-size:11px; color:#90A4AE; margin-top:1px;">
@@ -398,9 +355,9 @@
                                     </MudText>
                                 </div>
                                 <span style="font-size:10px; font-weight:600;
-                                                         padding:2px 10px; border-radius:20px;
-                                                         background:#E1F5FE; border:1px solid #81D4FA;
-                                                         color:#0288D1; white-space:nowrap;">
+                                                                     padding:2px 10px; border-radius:20px;
+                                                                     background:#E1F5FE; border:1px solid #81D4FA;
+                                                                     color:#0288D1; white-space:nowrap;">
                                     @s.Course
                                 </span>
                             </div>
@@ -409,7 +366,7 @@
                 </div>
             }
 
-        </div>  @* ← closes: position:relative z-index:1 div *@
+        </div>
 
     </MudMainContent>
 
@@ -520,8 +477,8 @@
             {
                 <MudAlert Severity="Severity.Error" Dense="true"
                           Style="margin-top:10px; border-radius:8px;
-                                     background:#FFEBEE; color:#C62828;
-                                     border:1px solid #FFCDD2;">
+                                         background:#FFEBEE; color:#C62828;
+                                         border:1px solid #FFCDD2;">
                     @_validateError
                 </MudAlert>
             }
@@ -530,8 +487,8 @@
             {
                 var st = _validatedStudent;
                 <div style="background:#E8F5E9; border:1px solid #C8E6C9;
-                                border-radius:10px; padding:12px 14px; margin-top:12px;
-                                display:flex; align-items:center; gap:10px;">
+                                    border-radius:10px; padding:12px 14px; margin-top:12px;
+                                    display:flex; align-items:center; gap:10px;">
                     <MudIcon Icon="@Icons.Material.Filled.CheckCircle"
                              Style="color:#2E7D32; font-size:26px;" />
                     <div>
@@ -584,11 +541,6 @@
     private string _currentTime = "";
     private System.Threading.Timer? _clockTimer;
 
-    private bool _notifOpen = false;
-    private int _notifCount => _notifications.Count;
-    private List<NotifItem> _notifications = new();
-    private record NotifItem(string Title, string Message);
-
     private string _selectedStudent = "";
     private string _selectedViolationType = "";
     private string _selectedSeverity = "MINOR";
@@ -635,9 +587,6 @@
         _currentTime = DateTime.Now.ToString("MMM d · h:mm tt");
 
     public void Dispose() => _clockTimer?.Dispose();
-
-    private void ToggleNotifications() => _notifOpen = !_notifOpen;
-    private void CloseNotifications() => _notifOpen = false;
 
     private string _panelTitle => _activeTab switch
     {
