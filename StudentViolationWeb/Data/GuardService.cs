@@ -1,44 +1,45 @@
-﻿using System.Net.Http.Json;
+using System.Net.Http.Json;
 using StudentViolationWeb.Model;
 using StudentViolationWeb.Model.Response;
 
-namespace StudentViolationWeb
+namespace StudentViolationWeb.Data;
+
+
+public class GuardService
 {
-    public class GuardService
+    private readonly HttpClient _http;
+
+    public GuardService(HttpClient http)
     {
-        private readonly HttpClient _http;
+        _http = http;
+    }
 
-        public GuardService(HttpClient http)
+    public async Task<ServiceResponse<StudentModel>> ValidateStudentAsync(string studentNo)
+    {
+        try
         {
-            _http = http;
+            var response = await _http.GetAsync($"api/guards/student/validate?qrCode={Uri.EscapeDataString(studentNo)}");
+            var result = await response.Content.ReadFromJsonAsync<ServiceResponse<StudentModel>>();
+            return result ?? new ServiceResponse<StudentModel> { Status = 500, Message = "Empty response" };
         }
-
-        public async Task<ServiceResponse<StudentModel>> ValidateStudentAsync(string studentNo)
+        catch (Exception ex)
         {
-            try
-            {
-                var response = await _http.GetAsync($"api/guards/student/validate?qrCode={Uri.EscapeDataString(studentNo)}");
-                var result = await response.Content.ReadFromJsonAsync<ServiceResponse<StudentModel>>();
-                return result ?? new ServiceResponse<StudentModel> { Status = 500, Message = "Empty response" };
-            }
-            catch (Exception ex)
-            {
-                return new ServiceResponse<StudentModel> { Status = 500, Message = ex.Message };
-            }
+            return new ServiceResponse<StudentModel> { Status = 500, Message = ex.Message };
         }
+    }
 
-        public async Task<ServiceResponse<RecordViolationModel>> RecordViolationAsync(RecordViolationModel model)
+    public async Task<ServiceResponse<RecordViolationModel>> RecordViolationAsync(RecordViolationModel model)
+    {
+        try
         {
-            try
-            {
-                var response = await _http.PostAsJsonAsync("api/violations", model);
-                var result = await response.Content.ReadFromJsonAsync<ServiceResponse<RecordViolationModel>>();
-                return result ?? new ServiceResponse<RecordViolationModel> { Status = 500, Message = "Empty response" };
-            }
-            catch (Exception ex)
-            {
-                return new ServiceResponse<RecordViolationModel> { Status = 500, Message = ex.Message };
-            }
+            var response = await _http.PostAsJsonAsync("api/violations", model);
+            var result = await response.Content.ReadFromJsonAsync<ServiceResponse<RecordViolationModel>>();
+            return result ?? new ServiceResponse<RecordViolationModel> { Status = 500, Message = "Empty response" };
+        }
+        catch (Exception ex)
+        {
+            return new ServiceResponse<RecordViolationModel> { Status = 500, Message = ex.Message };
         }
     }
 }
+    

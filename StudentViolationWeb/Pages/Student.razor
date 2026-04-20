@@ -1,4 +1,5 @@
 ﻿@page "/student"
+@using StudentViolationWeb.Data
 @inject NavigationManager Nav
 @inject HttpClient Http
 @inject AuthService AuthService
@@ -410,7 +411,7 @@
         $"font-size:10px; font-weight:{(_activeTab == idx ? "700" : "400")}; " +
         $"color:{(_activeTab == idx ? "#1A237E" : "#90A4AE")}; font-family:inherit;";
 
-    private string SeverityBadgeStyle(string severity) => severity switch
+    private string SeverityBadgeStyle(string? severity) => severity switch
     {
         "MAJOR"    => "padding:2px 8px; border-radius:20px; font-size:10px; font-weight:600; " +
                       "background:rgba(249,168,37,0.12); border:1px solid rgba(249,168,37,0.4); color:#F9A825;",
@@ -420,7 +421,7 @@
                       "background:rgba(2,136,209,0.10); border:1px solid rgba(2,136,209,0.35); color:#0288D1;"
     };
 
-    private string StatusBadgeStyle(string status) => status switch
+    private string StatusBadgeStyle(string? status) => status switch
     {
         "Approved" => "padding:2px 8px; border-radius:20px; font-size:10px; font-weight:600; " +
                       "background:rgba(46,125,50,0.10); border:1px solid rgba(46,125,50,0.35); color:#2E7D32;",

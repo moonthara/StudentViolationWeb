@@ -1,4 +1,5 @@
 ﻿@page "/guard/"
+@using StudentViolationWeb.Data
 @implements IDisposable
 @inject NavigationManager Nav
 @inject AuthService AuthService
@@ -37,7 +38,7 @@
                        Style="color:#546E7A;" />
     </MudAppBar>
 
-    <!-- MAIN CONTENT -->
+    @* main *@
     <MudMainContent Style="background:#F4F9FD; min-height:100vh; padding-bottom:80px;">
 
         <div style="position:fixed; inset:0;
@@ -52,7 +53,7 @@
 
         <div style="position:relative; z-index:1; padding:16px 16px 0;">
 
-            <!-- WELCOME BANNER (Record tab only) -->
+            @* welcome *@
             @if (_activeTab == 0)
             {
                 <div style="background:linear-gradient(135deg,#FFFFFF,#E1F5FE);
@@ -81,7 +82,7 @@
                 </div>
             }
 
-            <!-- PANEL HEADER -->
+            @* panel *@
             <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
                 <div style="width:4px; height:20px;
                             background:@_accentColor;
@@ -101,7 +102,7 @@
                 }
             </div>
 
-            <!-- ═══ TAB 0 — RECORD VIOLATION ═══ -->
+            @* record_violation *@
             @if (_activeTab == 0)
             {
                 <div style="background:#FFFFFF; border:1px solid #E1F5FE;
@@ -220,7 +221,7 @@
                 </MudButton>
             }
 
-            <!-- ═══ TAB 1 — VIOLATION HISTORY ═══ -->
+            @* violation_history *@
             @if (_activeTab == 1)
             {
                 <div style="display:flex; gap:10px; margin-bottom:16px;">
@@ -257,7 +258,7 @@
                 }
             }
 
-            <!-- ═══ TAB 2 — VIOLATION SUMMARY ═══ -->
+            @* violation_summary *@
             @if (_activeTab == 2)
             {
                 <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:14px;">
@@ -309,7 +310,7 @@
                 }
             }
 
-            <!-- ═══ TAB 3 — ALL STUDENTS ═══ -->
+            @* all_students *@
             @if (_activeTab == 3)
             {
                 <div style="background:#FFFFFF; border:1px solid #E1F5FE;
@@ -370,7 +371,7 @@
 
     </MudMainContent>
 
-    <!-- BOTTOM NAV BAR -->
+    @* bootom_bar *@
     <div style="position:fixed; bottom:0; left:0; right:0; z-index:300;
                 background:rgba(255,255,255,0.97); backdrop-filter:blur(24px);
                 border-top:1px solid #E1F5FE;
@@ -411,7 +412,7 @@
 
     </div>
 
-    <!-- QR SCANNER DIALOG -->
+    @* qr_code *@
     <MudDialog @bind-IsVisible="_qrModalOpen" Options="_qrDialogOptions">
         <TitleContent>
             <div style="display:flex; align-items:center; gap:8px;">
@@ -541,7 +542,6 @@
     private string _currentTime = "";
     private System.Threading.Timer? _clockTimer;
 
-    private string _selectedStudent = "";
     private string _selectedViolationType = "";
     private string _selectedSeverity = "MINOR";
     private string _remarks = "";

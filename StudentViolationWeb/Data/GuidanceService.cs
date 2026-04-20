@@ -2,6 +2,8 @@
 using StudentViolationWeb.Model;
 using StudentViolationWeb.Model.Response;
 
+namespace StudentViolationWeb.Data;
+
 public class GuidanceService
 {
     private readonly HttpClient _http;

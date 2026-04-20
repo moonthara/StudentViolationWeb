@@ -2,6 +2,8 @@
 using StudentViolationWeb.Model.Response;
 using System.Net.Http.Json;
 
+namespace StudentViolationWeb.Data;
+
 public class SaoService
 {
     private readonly HttpClient _http;

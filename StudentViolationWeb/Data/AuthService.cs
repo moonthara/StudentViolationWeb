@@ -4,71 +4,71 @@ using StudentViolationWeb.Model.Response;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
+namespace StudentViolationWeb.Data;
 
+public class AuthService
+{
+    private readonly HttpClient _http;
+    private readonly ILocalStorageService _localStorage;
 
-    public class AuthService
+    public AuthService(HttpClient http, ILocalStorageService localStorage)
     {
-        private readonly HttpClient _http;
-        private readonly ILocalStorageService _localStorage;
+        _http = http;
+        _localStorage = localStorage;
+    }
 
-        public AuthService(HttpClient http, ILocalStorageService localStorage)
+    public async Task<ServiceResponse<LoginDto>> LoginAsync(LoginModel login)
+    {
+        try
         {
-            _http = http;
-            _localStorage = localStorage;
+            var response = await _http.PostAsJsonAsync("api/auth/login", login);
+            var result = await response.Content.ReadFromJsonAsync<ServiceResponse<LoginDto>>();
+
+            if (result?.Token != null)
+            {
+                await _localStorage.SetItemAsync("authToken", result.Token);
+                _http.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", result.Token);
+            }
+            return result ?? new ServiceResponse<LoginDto> { Status = 500, Message = "Empty response" };
         }
-
-        public async Task<ServiceResponse<LoginDto>> LoginAsync(LoginModel login)
+        catch (Exception ex)
         {
-            try
-            {
-                var response = await _http.PostAsJsonAsync("api/auth/login", login);
-                var result = await response.Content.ReadFromJsonAsync<ServiceResponse<LoginDto>>();
-
-                if (result?.Token != null)
-                {
-                    await _localStorage.SetItemAsync("authToken", result.Token);
-                    _http.DefaultRequestHeaders.Authorization =
-                        new AuthenticationHeaderValue("Bearer", result.Token);
-                }
-                return result ?? new ServiceResponse<LoginDto> { Status = 500, Message = "Empty response" };
-            }
-            catch (Exception ex)
-            {
-                return new ServiceResponse<LoginDto> { Status = 500, Message = ex.Message };
-            }
-        }
-
-        public async Task<ServiceResponse<LoginDto>> RegisterAsync(RegisterModel register)
-        {
-            try
-            {
-                var response = await _http.PostAsJsonAsync("api/auth/register", register);
-                var result = await response.Content.ReadFromJsonAsync<ServiceResponse<LoginDto>>();
-
-                if (result?.Token != null)
-                {
-                    await _localStorage.SetItemAsync("authToken", result.Token);
-                    _http.DefaultRequestHeaders.Authorization =
-                        new AuthenticationHeaderValue("Bearer", result.Token);
-                }
-                return result ?? new ServiceResponse<LoginDto> { Status = 500, Message = "Empty response" };
-            }
-            catch (Exception ex)
-            {
-                return new ServiceResponse<LoginDto> { Status = 500, Message = ex.Message };
-            }
-        }
-
-        public async Task Logout()
-        {
-            await _localStorage.RemoveItemAsync("authToken");
-            _http.DefaultRequestHeaders.Authorization = null;
+            return new ServiceResponse<LoginDto> { Status = 500, Message = ex.Message };
         }
     }
 
-    public class LoginDto
+    public async Task<ServiceResponse<LoginDto>> RegisterAsync(RegisterModel register)
     {
-        public string? Role { get; set; }
-        public string? Token { get; set; }
+        try
+        {
+            var response = await _http.PostAsJsonAsync("api/auth/register", register);
+            var result = await response.Content.ReadFromJsonAsync<ServiceResponse<LoginDto>>();
+
+            if (result?.Token != null)
+            {
+                await _localStorage.SetItemAsync("authToken", result.Token);
+                _http.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", result.Token);
+            }
+            return result ?? new ServiceResponse<LoginDto> { Status = 500, Message = "Empty response" };
+        }
+        catch (Exception ex)
+        {
+            return new ServiceResponse<LoginDto> { Status = 500, Message = ex.Message };
+        }
     }
+
+    public async Task Logout()
+    {
+        await _localStorage.RemoveItemAsync("authToken");
+        _http.DefaultRequestHeaders.Authorization = null;
+    }
+}
+
+public class LoginDto
+{
+    public string? Role { get; set; }
+    public string? Token { get; set; }
+}
 
