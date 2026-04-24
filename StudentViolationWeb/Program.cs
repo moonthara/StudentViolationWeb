@@ -21,6 +21,6 @@ builder.Services.AddScoped<GuidanceService>();
 builder.Services.AddScoped<SaoService>();
 
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://10.65.47.154:5277") }); 
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://192.168.254.148:5277/") }); 
 
 await builder.Build().RunAsync();
