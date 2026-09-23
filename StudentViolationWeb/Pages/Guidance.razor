@@ -467,20 +467,20 @@
 @if (_showLogoutDialog)
 {
     <div style="position:fixed; inset:0; background:rgba(0,0,0,0.5);
-                    z-index:1000; display:flex; align-items:center; justify-content:center;
-                    padding:16px;">
+                z-index:1000; display:flex; align-items:center; justify-content:center;
+                padding:16px;">
         <div style="background:#FFFFFF; border-radius:20px; padding:24px;
-                        width:100%; max-width:360px;
-                        box-shadow:0 20px 60px rgba(0,0,0,0.20);">
+                    width:100%; max-width:360px;
+                    box-shadow:0 20px 60px rgba(0,0,0,0.20);">
 
             <div style="display:flex; flex-direction:column; align-items:center;
-                            text-align:center; margin-bottom:20px;">
+                        text-align:center; margin-bottom:20px;">
                 <div style="width:52px; height:52px; border-radius:50%;
-                                background:linear-gradient(135deg,#E1F5FE,#B3E5FC);
-                                border:1px solid #81D4FA;
-                                display:flex; align-items:center; justify-content:center;
-                                margin-bottom:12px;
-                                box-shadow:0 4px 8px rgba(2,136,209,0.15);">
+                            background:linear-gradient(135deg,#E1F5FE,#B3E5FC);
+                            border:1px solid #81D4FA;
+                            display:flex; align-items:center; justify-content:center;
+                            margin-bottom:12px;
+                            box-shadow:0 4px 8px rgba(2,136,209,0.15);">
                     <MudIcon Icon="@Icons.Material.Filled.Logout"
                              Style="color:#0288D1; font-size:26px;" />
                 </div>
@@ -498,16 +498,16 @@
                            FullWidth="true"
                            OnClick="CloseLogoutDialog"
                            Style="border-color:#90A4AE; color:#546E7A;
-                                      text-transform:none; border-radius:10px;">
+                                  text-transform:none; border-radius:10px;">
                     Cancel
                 </MudButton>
                 <MudButton Variant="Variant.Filled"
                            FullWidth="true"
                            OnClick="ConfirmLogout"
                            Style="background:#0288D1; color:#FFFFFF;
-                                      text-transform:none; font-weight:600;
-                                      border-radius:10px;
-                                      box-shadow:0 4px 8px rgba(2,136,209,0.25);">
+                                  text-transform:none; font-weight:600;
+                                  border-radius:10px;
+                                  box-shadow:0 4px 8px rgba(2,136,209,0.25);">
                     Log Out
                 </MudButton>
             </div>
@@ -515,6 +515,7 @@
         </div>
     </div>
 }
+
 
 @code {
     private int _activeTab = 0;
@@ -731,4 +732,5 @@
         "moderate" => "padding:2px 8px; border-radius:20px; font-size:10px; font-weight:600; background:rgba(2,136,209,0.10); border:1px solid rgba(2,136,209,0.35); color:#0288D1;",
         _ => "padding:2px 8px; border-radius:20px; font-size:10px; font-weight:600; background:rgba(96,125,139,0.10); border:1px solid rgba(96,125,139,0.35); color:#607D8B;"
     };
+
 }
